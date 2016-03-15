@@ -14,7 +14,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import database.SupplierDB;
 import entities.Supplier;
+
 
 public class SuppliersGUI extends JPanel {
 
@@ -85,7 +87,7 @@ public class SuppliersGUI extends JPanel {
    private class ButtonHandler implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-         Supplier p;// = getFieldData();
+         Supplier s;// = getFieldData();
          switch (e.getActionCommand()) {
          /*case "Save":
             if (isEmptyFieldData()) {
