@@ -12,9 +12,9 @@ public class SupplierDB {
    static final String JDBC_DRIVER =
       "com.mysql.jdbc.Driver";
    static final String DB_URL =
-      "jdbc:mysql://localhost:3306/mydatabase";
-   static final String DB_USER = "user1";
-   static final String DB_PASS = "secret";
+      "jdbc:postgresql://comp421.cs.mcgill.ca:5432/cs421";
+   static final String DB_USER = "cs421g01";
+   static final String DB_PASS = "snowio01";
    private JdbcRowSet rowSet = null;
    public SupplierDB() {
       try {
@@ -23,7 +23,7 @@ public class SupplierDB {
          rowSet.setUrl(DB_URL);
          rowSet.setUsername(DB_USER);
          rowSet.setPassword(DB_PASS);
-         rowSet.setCommand("SELECT * FROM Person");
+         rowSet.setCommand("SELECT * FROM Suppliers");
          rowSet.execute();
       }catch (SQLException | ClassNotFoundException e) {
          e.printStackTrace();
@@ -33,8 +33,8 @@ public class SupplierDB {
       try {
          rowSet.moveToInsertRow();
          rowSet.updateString("supplierID", s.getSupplierID());
-         rowSet.updateString("firstName", s.getAddress());
-         rowSet.updateString("middleName", s.getName());
+         rowSet.updateString("address", s.getAddress());
+         rowSet.updateString("name", s.getName());
          rowSet.insertRow();
          rowSet.moveToCurrentRow();
       } catch (SQLException ex) {
@@ -52,8 +52,8 @@ public class SupplierDB {
    public Supplier update(Supplier s) {
       try {
          rowSet.updateString("supplierID", s.getSupplierID());
-         rowSet.updateString("firstName", s.getAddress());
-         rowSet.updateString("address", s.getName());
+         rowSet.updateString("address", s.getAddress());
+         rowSet.updateString("name", s.getName());
          rowSet.updateRow();
          rowSet.moveToCurrentRow();
       } catch (SQLException ex) {
