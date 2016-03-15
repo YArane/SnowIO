@@ -29,7 +29,7 @@ public class Table {
     
     // Example input:
     //String createSQL = "CREATE TABLE " + tableName + "(id INTEGER, name VARCHAR (30), address VARCHAR(30))";
-    public void createTable(String createSQL){
+    public void create(String createSQL){
         try{
             statement.executeUpdate(createSQL);
         }catch(SQLException e){
@@ -74,5 +74,9 @@ public class Table {
         // Your code to handle errors comes here;-
         // something more meaningful than a print would be good-
         System.out.println("Code: " + sqlCode + "  sqlState: " + sqlState);
+    }
+
+    public String getTableName() {
+        return this.tableName;
     }
 }
