@@ -12,6 +12,8 @@ public class Main {
 
     public static void main(String[] args) {
         
+        
+        
         JFrame frame=new JFrame("SnowIO");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout((LayoutManager) new FlowLayout(FlowLayout.CENTER));
