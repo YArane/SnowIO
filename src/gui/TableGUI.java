@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import net.miginfocom.swing.MigLayout;
+//import net.miginfocom.swing.MigLayout;
 
 public class TableGUI extends JPanel {
 
@@ -60,7 +60,7 @@ public class TableGUI extends JPanel {
 
    private JPanel initFields() {
       JPanel panel = new JPanel();
-      panel.setLayout(new MigLayout());
+      //panel.setLayout(new MigLayout());
       panel.add(new JLabel("ID"), "align label");
       panel.add(idField, "wrap");
       idField.setEnabled(false);
