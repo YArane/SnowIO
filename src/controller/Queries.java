@@ -3,6 +3,8 @@ package controller;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import controller.CustomerOptions.RentalStatus;
+
 import database.JDBC;
 
 public class Queries {
@@ -81,6 +83,66 @@ public class Queries {
     							+ "WHERE RO.Rental_Order_ID = '" + rentalOrderID + "';";
     	ResultSet rs = jdbc.query(rentalOrderQuery);
        
+        return rs;
+    }
+    
+    public static ResultSet getCustomers(CustomerOptions options) {
+    	JDBC jdbc = JDBC.getInstance();
+    	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "
+    							+ "FROM Customers C "
+    							+ "INNER JOIN BillingInformation BI ON BI.Credit_Card_Number = C.Credit_Card_Number "
+    							+ "INNER JOIN RentalOrders RO ON C.Customer_ID = RO.Customer_ID "
+    							+ "INNER JOIN ("
+    							+ "(SELECT C.Customer_ID, 'Yes' AS Has_Rental_Order FROM RentalOrders RO LEFT JOIN Customers C ON C.Customer_ID = RO.Customer_ID AND C.Customer_ID IS NOT NULL GROUP BY C.Customer_ID)"
+    							+ " UNION "
+    							+ "(SELECT C.Customer_ID, 'No' AS Has_Rental_Order FROM RentalOrders RO LEFT JOIN Customers C ON C.Customer_ID = RO.Customer_ID AND C.Customer_ID IS NULL GROUP BY C.Customer_ID)"
+    							+ ") HRO ON HRO.Customer_ID = C.Customer_ID ";
+    	
+       	// OPTIONS
+    	String whereClause = "";
+    	if(options.getRentalStatus() == RentalStatus.CURRENTLY_RENTING) {
+    		whereClause += "HRO.Has_Rental_Order = 'Yes' ";
+    	}else if(options.getRentalStatus() == RentalStatus.NOT_CURRENTLY_RENTING) {
+    		whereClause += "HRO.Has_Rental_Order = 'No' ";
+    	}
+    	if(!options.getName().equals("")) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "C.Name LIKE '%" + options.getName() + "%' ";
+    	}
+    	if(!whereClause.equals("")) {
+			whereClause = "WHERE " + whereClause;
+		}    	
+    	customersQuery += whereClause;
+    	
+    	// GROUP BY
+    	customersQuery += "GROUP BY C.Customer_ID, BI.Credit_Card_Number, HRO.Has_Rental_Order ";
+    	
+    	// ORDERING
+		/*
+    	switch(options.getOrdering()) {
+    	case CUSTOMER:
+    		rentalOrderQuery += "ORDER BY Customer_Name";
+    		break;
+    	case EMPLOYEE:
+    		rentalOrderQuery += "ORDER BY Employee_Name";
+    		break;
+    	case TOTAL_PRICE:
+    		rentalOrderQuery += "ORDER BY RO.Total_Price";
+    		break;
+    	case DATE_IN:
+    		rentalOrderQuery += "ORDER BY RO.Date_In";
+    		break;
+    	case DATE_OUT:
+    		rentalOrderQuery += "ORDER BY RO.Date_Out";
+    		break;
+    	}
+    	*/
+    	customersQuery += ";";
+        System.out.println(customersQuery);
+    	ResultSet rs = jdbc.query(customersQuery);
+    	
         return rs;
     }
 }
