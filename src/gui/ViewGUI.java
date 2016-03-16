@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 
+import controller.Queries;
+import controller.RentalOrderOptions;
 import database.JDBC;
 
 public class ViewGUI extends JFrame{
@@ -121,6 +123,7 @@ public class ViewGUI extends JFrame{
             String error = jdbc.openConnection(password);
             if(error.equals(JDBC.SUCCESS)){
                 displayDialog("Succesfully connected to the database.");
+                Queries.getRentalOrders(new RentalOrderOptions());        
                 getContentPane().add(tabs, BorderLayout.CENTER);
                 getContentPane().remove(connectButton);
                 setSize(800, 600);

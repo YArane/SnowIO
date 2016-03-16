@@ -7,6 +7,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import controller.Queries;
+import controller.RentalOrderOptions;
+
 public class CurrentRentalsGUI extends JPanel{
 
     public CurrentRentalsGUI() {
