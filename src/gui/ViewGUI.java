@@ -37,7 +37,6 @@ public class ViewGUI extends JFrame{
         super("SnowIO");
 
         initFrame();
-        initTabs();
         initMenus();
         
     }
@@ -122,8 +121,8 @@ public class ViewGUI extends JFrame{
             JDBC jdbc = JDBC.getInstance();
             String error = jdbc.openConnection(password);
             if(error.equals(JDBC.SUCCESS)){
+                initTabs();
                 displayDialog("Succesfully connected to the database.");
-                Queries.getRentalOrders(new RentalOrderOptions());        
                 getContentPane().add(tabs, BorderLayout.CENTER);
                 getContentPane().remove(connectButton);
                 setSize(800, 600);

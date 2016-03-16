@@ -51,7 +51,7 @@ public class Queries {
     		rentalOrderQuery += "ORDER BY Employee_Name";
     		break;
     	case TOTAL_PRICE:
-    		rentalOrderQuery += "ORDER BY RO.TotalPrice";
+    		rentalOrderQuery += "ORDER BY RO.Total_Price";
     		break;
     	case DATE_IN:
     		rentalOrderQuery += "ORDER BY RO.Date_In";
@@ -64,11 +64,7 @@ public class Queries {
     	rentalOrderQuery += ";";
         System.out.println(rentalOrderQuery);
     	ResultSet rs = jdbc.query(rentalOrderQuery);
-        try {
-            System.out.println(rs.getString(1));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    	
         return rs;
     }
     
@@ -80,7 +76,7 @@ public class Queries {
     							+ "INNER JOIN Customers C ON C.Customer_ID = RO.Customer_ID "
     							+ "WHERE RO.Rental_Order_ID = '" + rentalOrderID + "';";
     	ResultSet rs = jdbc.query(rentalOrderQuery);
-        System.out.println(rs);
+       
         return rs;
     }
 }

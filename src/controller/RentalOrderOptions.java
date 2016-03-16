@@ -22,6 +22,27 @@ public class RentalOrderOptions {
 	public void setOrdering(Ordering o) {
 		ordering = o;
 	}
+	public void setOrdering(String o){
+	    switch(o){
+	        case "customer_name":
+	            setOrdering(Ordering.CUSTOMER); 
+	            break;
+	        case "employee_name":
+	            setOrdering(Ordering.EMPLOYEE); 
+	            break;
+	        case "date_in":
+	            setOrdering(Ordering.DATE_IN); 
+	            break;
+	        case "date_out":
+	            setOrdering(Ordering.DATE_OUT); 
+	            break;
+	        case "total_price":
+               setOrdering(Ordering.TOTAL_PRICE); 
+               break;
+	        default:
+	            setOrdering(ordering);
+	    }
+	}
 	
 	public void setEmployeeName(String e) {
 		employee_name = e;
