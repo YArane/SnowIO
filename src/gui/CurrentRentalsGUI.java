@@ -1,17 +1,24 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -23,18 +30,36 @@ public class CurrentRentalsGUI extends JPanel{
 
     private JTable table;
     
+    private JTextField searchField;
+    
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
     
     public CurrentRentalsGUI() {
+        setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
+        add(initButtons(), BorderLayout.NORTH);
+        add(initTable(), BorderLayout.CENTER);
+    }
+    
+    public JComponent initTable(){
+        JScrollPane scrollPane = null;
         try {
             table = new JTable(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
             table.getSelectionModel().addListSelectionListener(new TableHandler());
             table.getTableHeader().addMouseListener(new HeaderHandler());
-            JScrollPane scrollPane = new JScrollPane(table);
-            add(scrollPane);
+            scrollPane = new JScrollPane(table);
         } catch (SQLException e) {
             e.printStackTrace();
         }        
+        return scrollPane;
+    }
+    
+    public JComponent initButtons(){
+        JPanel panel = new JPanel();
+        panel.setBorder(new TitledBorder(new EtchedBorder(),"Filter results.."));
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        searchField = new JTextField(10);
+        panel.add(searchField);
+        return panel;
     }
     
     @Override
