@@ -1,6 +1,6 @@
 package main;
 
-import gui.TableGUI;
+import gui.ignore;
 import gui.ViewGUI;
 
 import java.awt.FlowLayout;

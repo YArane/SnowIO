@@ -27,7 +27,7 @@ public class CurrentRentalsGUI extends JPanel{
     
     public CurrentRentalsGUI() {
         try {
-            table = new JTable(TableGUI2.buildTableModel(Queries.getRentalOrders(tableOptions)));
+            table = new JTable(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
             table.getSelectionModel().addListSelectionListener(new TableHandler());
             table.getTableHeader().addMouseListener(new HeaderHandler());
             JScrollPane scrollPane = new JScrollPane(table);
@@ -61,7 +61,7 @@ public class CurrentRentalsGUI extends JPanel{
                 System.out.println(table.getColumnName(column));
                 tableOptions.setOrdering(table.getColumnName(column));
                 try {
-                    table.setModel(TableGUI2.buildTableModel(Queries.getRentalOrders(tableOptions)));
+                    table.setModel(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
