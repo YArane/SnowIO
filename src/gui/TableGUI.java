@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,10 +16,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
-import database.Table;
 
-
-public class SuppliersGUI extends JPanel {
+public class TableGUI extends JPanel {
 
    private JTextField idField = new JTextField(10);
    private JTextField nameField = new JTextField(30);
@@ -28,16 +27,23 @@ public class SuppliersGUI extends JPanel {
 
    private JButton createButton = new JButton("New...");
    private JButton updateButton = new JButton("Update");
-   private JButton deleteButton = new JButton("Update");
+   private JButton deleteButton = new JButton("Delete");
    
-   private Table supplierTable = new Table("Suppliers");
+  // private Table supplierTable = new Table("Suppliers");
 
-   public SuppliersGUI() {
+   public TableGUI() {
       setBorder(new TitledBorder
       (new EtchedBorder(),"Suppliers Details"));
       setLayout(new BorderLayout(5, 5));
       add(initFields(), BorderLayout.NORTH);
       add(initButtons(), BorderLayout.CENTER);
+   }
+   
+   public Dimension getPreferredSize(){
+       Dimension size = super.getPreferredSize();
+       size.width = 785;   
+       size.height = 495;  
+       return size;
    }
 
    private JPanel initButtons() {
@@ -45,6 +51,10 @@ public class SuppliersGUI extends JPanel {
       panel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
       panel.add(createButton);
       createButton.addActionListener((ActionListener) new ButtonHandler());
+      panel.add(updateButton);
+      updateButton.addActionListener((ActionListener) new ButtonHandler());
+      panel.add(deleteButton);
+      deleteButton.addActionListener((ActionListener) new ButtonHandler());
       return panel;
    }
 
@@ -90,7 +100,7 @@ public class SuppliersGUI extends JPanel {
                "Cannot create an empty record");
                return;
             }
-            supplierTable.insert(insertSQL);
+            //supplierTable.insert(insertSQL);
             JOptionPane.showMessageDialog(null, "New supplier created successfully.");
             createButton.setText("New...");
             break;
@@ -103,7 +113,7 @@ public class SuppliersGUI extends JPanel {
                JOptionPane.showMessageDialog(null, "Cannot update an empty record");
                return;
             }
-            supplierTable.update(updateSQL);
+            //supplierTable.update(updateSQL);
             JOptionPane.showMessageDialog(null,"Supplier is updated successfully");
                break;
          /*case "Delete":

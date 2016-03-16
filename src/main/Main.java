@@ -1,6 +1,7 @@
 package main;
 
-import gui.SuppliersGUI;
+import gui.TableGUI;
+import gui.ViewGUI;
 
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
@@ -8,28 +9,51 @@ import java.awt.LayoutManager;
 import javax.swing.JFrame;
 
 import database.JDBC;
-import database.Table;
-
 
 public class Main {
 
     public static void main(String[] args) {
+
+        //init_model();
+        testConnection();
+        init_view();
+        init_controller();
         
+    }
+    // Model: Postgresql Databse Server
+    public static void init_model(){
         JDBC jdbc = JDBC.getInstance();
         jdbc.openConnection();
-        
-        Table suppliersTable = new Table("Suppliers");
-        String insertSQL = "INSERT INTO " + suppliersTable.getTableName() + " VALUES ( 3 , \'Yarden did this from\', \'main method\', 123456 ) ";
-        suppliersTable.insert(insertSQL);
-        
+    }
+    
+    public static void close_model(){
+        JDBC jdbc = JDBC.getInstance();
         jdbc.closeConnection();
+    }
+    
+    //View: GUI input (singleton);
+    public static void init_view(){
+        ViewGUI gui = new ViewGUI();
+    }
+
+    //Controller: Queries
+    public static void init_controller(){
         
-        /*JFrame frame=new JFrame("SnowIO");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().setLayout((LayoutManager) new FlowLayout(FlowLayout.CENTER));
-        frame.getContentPane().add(new SuppliersGUI());
-        frame.setSize(640, 360);
-        frame.setVisible(true);*/
+    }
+    
+    /*
+     * Test the communication!
+     *         -- change up the insertSQL statement and check the results on server.
+     *                           !!!!   (don't drop tables! )!!!!  
+     */
+    public static void testConnection(){
+        JDBC jdbc = JDBC.getInstance();
+        jdbc.openConnection();
+
+        String insertSQL = "INSERT INTO suppliers VALUES ( 3 , \'Yarden did this from\', \'main method\', 123456 ) ";
+        jdbc.update(insertSQL);
+
+        jdbc.closeConnection();
 
     }
 
