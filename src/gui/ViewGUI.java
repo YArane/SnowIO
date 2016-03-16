@@ -141,7 +141,6 @@ public class ViewGUI extends JFrame{
             displayDialog("Succesfully disconnected from database.");
             getContentPane().remove(tabs);
             initFrame();
-            //repaint();
         }else
             displayDialog("Could not disconnect from the database\n" + error);
     }
