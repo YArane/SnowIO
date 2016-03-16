@@ -19,6 +19,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -30,7 +32,7 @@ public class CurrentRentalsGUI extends JPanel{
 
     private JTable table;
     
-    private JTextField searchField;
+    private JTextField customerField, employeeField;
     
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
     
@@ -57,8 +59,16 @@ public class CurrentRentalsGUI extends JPanel{
         JPanel panel = new JPanel();
         panel.setBorder(new TitledBorder(new EtchedBorder(),"Filter results.."));
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        searchField = new JTextField(10);
-        panel.add(searchField);
+        JLabel customerLabel = new JLabel("Customer Name");
+        customerField = new JTextField(20);
+        customerField.getDocument().addDocumentListener(new CustomerFieldHandler());
+        panel.add(customerLabel, BorderLayout.NORTH);
+        panel.add(customerField);
+        JLabel employeeLabel = new JLabel("Employee Name");
+        employeeField = new JTextField(20);
+        employeeField.getDocument().addDocumentListener(new EmployeeFieldHandler());
+        panel.add(employeeLabel, BorderLayout.NORTH);
+        panel.add(employeeField);
         return panel;
     }
     
@@ -68,6 +78,48 @@ public class CurrentRentalsGUI extends JPanel{
         size.width = 780;   
         size.height = 580;  
         return size;
+    }
+    
+    private class CustomerFieldHandler implements DocumentListener{
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            tableOptions.setCustomerName(customerField.getText());
+            updateTable();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            tableOptions.setCustomerName("");
+            updateTable(); 
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            // TODO Auto-generated method stub
+        }
+        
+    }
+    private class EmployeeFieldHandler implements DocumentListener{
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            tableOptions.setEmployeeName(employeeField.getText());
+            updateTable();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            tableOptions.setEmployeeName("");
+            updateTable(); 
+            
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            // TODO Auto-generated method stub
+        }
+        
     }
     
     private class TableHandler implements ListSelectionListener{
@@ -85,11 +137,7 @@ public class CurrentRentalsGUI extends JPanel{
             if(column > -1){
                 System.out.println(table.getColumnName(column));
                 tableOptions.setOrdering(table.getColumnName(column));
-                try {
-                    table.setModel(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
+                updateTable();
             } 
         }
 
@@ -117,6 +165,14 @@ public class CurrentRentalsGUI extends JPanel{
             
         }
         
+    }
+    
+    private void updateTable(){
+        try {
+            table.setModel(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
     }
     
     

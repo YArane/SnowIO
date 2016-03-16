@@ -6,21 +6,7 @@ import java.sql.SQLException;
 import database.JDBC;
 
 public class Queries {
-   
-   /**
-    * Class to hold Postgresql operations 
-    */
-    
-    public static ResultSet getCurrentRentals(){
-        JDBC jdbc = JDBC.getInstance();
-        String currentRentalsQuery = "SELECT (name, phone_number, date_in, date_out) FROM "
-                                   + "rentalorders INNER JOIN customers "
-                                   + "ON rentalorders.customer_id = customers.customer_id;";
-        ResultSet rs = jdbc.query(currentRentalsQuery);
-        System.out.println(rs);
-        return rs;
-    }
-    
+
     /**
      * 
      * @param options RentalOrderOptions to handle default values and/or options for the query
@@ -36,13 +22,13 @@ public class Queries {
     	// OPTIONS
     	String whereClause = "";
     	if(!options.getCustomerName().equals("")) {
-    		whereClause += "Customer_Name LIKE '%" + options.getCustomerName() + "%' ";
+    		whereClause += "C.Name LIKE '%" + options.getCustomerName() + "%' ";
     	}
-    	if(!options.getCustomerName().equals("")) {
+    	if(!options.getEmployeeName().equals("")) {
     		if(!whereClause.equals("")) {
     			whereClause += "AND ";
     		}
-    		whereClause += "Employee_Name LIKE '%" + options.getEmployeeName() + "%' ";
+    		whereClause += "E.Name LIKE '%" + options.getEmployeeName() + "%' ";
     	}
     	if(options.getCurrentOrders() && !options.getPastOrders()) {
     		if(!whereClause.equals("")) {
