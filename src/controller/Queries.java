@@ -74,7 +74,7 @@ public class Queries {
     
     public static ResultSet getRentalOrderByID(String rentalOrderID) {
     	JDBC jdbc = JDBC.getInstance();
-    	String rentalOrderQuery = "SELECT (RO.Date_In, RO.Date_Out, E.Name AS Employee_Name, E.Type AS Employee_Type, C.Name AS Customer_Name, C.Address AS Customer_Address, C.Phone_Number AS Customer_Phone_Number) "
+    	String rentalOrderQuery = "SELECT RO.Date_In, RO.Date_Out, E.Name AS Employee_Name, E.Type AS Employee_Type, C.Name AS Customer_Name, C.Address AS Customer_Address, C.Phone_Number AS Customer_Phone_Number "
     							+ "FROM RentalOrders RO"
     							+ "INNER JOIN Employees E ON E.Employee_ID = RO.Employee_ID "
     							+ "INNER JOIN Customers C ON C.Customer_ID = RO.Customer_ID "
