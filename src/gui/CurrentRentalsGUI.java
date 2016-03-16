@@ -13,4 +13,5 @@ public class CurrentRentalsGUI extends Component {
         return size;
     }
     
+    
 }

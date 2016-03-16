@@ -14,16 +14,16 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //init_model();
-        testConnection();
+        init_model();
+        //testConnection();
         init_view();
         init_controller();
-        
+
     }
     // Model: Postgresql Databse Server
     public static void init_model(){
         JDBC jdbc = JDBC.getInstance();
-        jdbc.openConnection();
+        //jdbc.openConnection();
     }
     
     public static void close_model(){
@@ -48,7 +48,7 @@ public class Main {
      */
     public static void testConnection(){
         JDBC jdbc = JDBC.getInstance();
-        jdbc.openConnection();
+        //jdbc.openConnection();
 
         String insertSQL = "INSERT INTO suppliers VALUES ( 3 , \'Yarden did this from\', \'main method\', 123456 ) ";
         jdbc.update(insertSQL);

@@ -10,8 +10,12 @@ import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 
 import database.JDBC;
@@ -23,6 +27,7 @@ public class ViewGUI extends JFrame{
     private static JPanel queries;
     
     private static JTabbedPane tabs = new JTabbedPane();
+    private static JButton connectButton;
     
     public static Container contentPane;
     
@@ -30,31 +35,42 @@ public class ViewGUI extends JFrame{
         super("SnowIO");
 
         initFrame();
-        initMenus();
         initTabs();
-       
-    }
+        initMenus();
         
+    }
     private void initFrame(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(300, 200);
         Container contentPane = getContentPane();
         contentPane.setLayout((LayoutManager) new FlowLayout(FlowLayout.CENTER));
-        contentPane.add(tabs, BorderLayout.CENTER);
-        //contentPane.add(new TableGUI());               
+        connectButton = new JButton("Connect");
+        connectButton.addActionListener(new MenuHandler());
+        contentPane.add(connectButton, BorderLayout.CENTER);               
         setVisible(true);  
     }
 
     private void initMenus(){
         MenuBar menu = new MenuBar();
-        // File
-        //  -Exit
+        // File         Database
+        //  -Exit           -Connect
+        //                  -Disconnect
 
         Menu fileMenu = new Menu("File");       
         MenuItem exit = new MenuItem("Exit");
         exit.addActionListener(new MenuHandler()); 
         fileMenu.add(exit);                 
         menu.add(fileMenu);
+
+        Menu databaseMenu = new Menu("Database");
+        MenuItem connect = new MenuItem("Connect");
+        connect.addActionListener(new MenuHandler());
+        databaseMenu.add(connect);
+        MenuItem disconnect = new MenuItem("Disconnect");
+        disconnect.addActionListener(new MenuHandler());
+        databaseMenu.add(disconnect);
+        menu.add(databaseMenu);
+
         setMenuBar(menu);
     }
     
@@ -71,9 +87,62 @@ public class ViewGUI extends JFrame{
         public void actionPerformed(ActionEvent e){
             switch(e.getActionCommand()){
                 case "Exit":
-                    System.exit(0);
+                    JDBC jdbc = JDBC.getInstance();
+                    if(jdbc.isConnected())
+                       displayDialog("Please disconnect from the database before exiting."); 
+                    else
+                        System.exit(0);
+                    break;
+                case "Connect":
+                    connect();
+                    break;
+                case "Disconnect":
+                    disconnect();
                     break;
             }
         }
+    }
+    
+    private void connect(){
+        // Password prompt
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Enter a password:");
+        JPasswordField passwordField = new JPasswordField(10);
+        panel.add(label);
+        panel.add(passwordField);
+        String[] options = new String[]{"OK", "Cancel"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Connect",
+                                 JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                                 null, options, options[0]);
+        if(option == 0) // pressing OK button
+        {
+            String password = String.valueOf(passwordField.getPassword());
+            JDBC jdbc = JDBC.getInstance();
+            String error = jdbc.openConnection(password);
+            if(error.equals(JDBC.SUCCESS)){
+                displayDialog("Succesfully connected to the database.");
+                getContentPane().add(tabs, BorderLayout.CENTER);
+                getContentPane().remove(connectButton);
+                setSize(800, 600);
+                setVisible(true);
+            }else
+                displayDialog("Could not connect to the database\n" + error);
+        }
+    }
+    
+    public void displayDialog(String message){
+       JOptionPane.showMessageDialog(this, message);
+    }
+    
+    private void disconnect(){
+        JDBC jdbc = JDBC.getInstance();
+        String error = jdbc.closeConnection();
+        if(error.equals(JDBC.SUCCESS)){
+            displayDialog("Succesfully disconnected from database.");
+            getContentPane().remove(tabs);
+            initFrame();
+            //repaint();
+        }else
+            displayDialog("Could not disconnect from the database\n" + error);
     }
 }
