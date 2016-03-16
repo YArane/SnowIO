@@ -12,13 +12,33 @@ public class RentalOrderOptions {
 	private Ordering ordering;
 	private String employee_name;
 	private String customer_name;
+	private boolean pastOrders;
+	private boolean currentOrders;
 	
 	public RentalOrderOptions() {
 		ordering = Ordering.DATE_IN;
 		employee_name = "";
 		customer_name = "";
+		pastOrders = true;
+		currentOrders = true;
 	}
 	
+	public boolean getCurrentOrders() {
+		return currentOrders;
+	}
+
+	public void setCurrentOrders(boolean currentOrders) {
+		this.currentOrders = currentOrders;
+	}
+
+	public boolean getPastOrders() {
+		return pastOrders;
+	}
+
+	public void setPastOrders(boolean pastOrders) {
+		this.pastOrders = pastOrders;
+	}
+
 	public void setOrdering(Ordering o) {
 		ordering = o;
 	}

@@ -34,13 +34,31 @@ public class Queries {
     							+ "INNER JOIN Customers C ON C.Customer_ID = RO.Customer_ID ";
     	
     	// OPTIONS
+    	String whereClause = "";
     	if(!options.getCustomerName().equals("")) {
-    		rentalOrderQuery += "WHERE Customer_Name LIKE '%" + options.getCustomerName() + "%' ";
+    		whereClause += "Customer_Name LIKE '%" + options.getCustomerName() + "%' ";
     	}
     	if(!options.getCustomerName().equals("")) {
-    		rentalOrderQuery += "WHERE Employee_Name LIKE '%" + options.getEmployeeName() + "%' ";
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "Employee_Name LIKE '%" + options.getEmployeeName() + "%' ";
     	}
-    	
+    	if(options.getCurrentOrders() && !options.getPastOrders()) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "(RO.Date_In IS NULL OR RO.Date_In > now()) ";
+    	} else if (options.getPastOrders() && !options.getCurrentOrders()) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "RO.Date_In IS NOT NULL AND RO.Date_In < now() ";
+    	}
+    	if(!whereClause.equals("")) {
+			whereClause = "WHERE " + whereClause;
+		}    	
+    	rentalOrderQuery += whereClause;
     	
     	// ORDERING
     	switch(options.getOrdering()) {
