@@ -3,15 +3,29 @@ package gui;
 import java.awt.Component;
 import java.awt.Dimension;
 
-public class CurrentRentalsGUI extends Component {
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
+public class CurrentRentalsGUI extends JPanel{
+
+    public CurrentRentalsGUI() {
+        JScrollPane scrollPane = new JScrollPane();
+        JTable table = new JTable();
+        scrollPane.add(table);
+        add(scrollPane);
+        
+
+    }
+    
     @Override
     public Dimension getPreferredSize(){
         Dimension size = super.getPreferredSize();
-        size.width = 785;   
-        size.height = 495;  
+        size.width = 780;   
+        size.height = 580;  
         return size;
     }
+    
     
     
 }

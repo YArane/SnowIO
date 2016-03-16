@@ -41,7 +41,7 @@ public class ViewGUI extends JFrame{
     }
     private void initFrame(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(300, 200);
+        setSize(300, 100);
         Container contentPane = getContentPane();
         contentPane.setLayout((LayoutManager) new FlowLayout(FlowLayout.CENTER));
         connectButton = new JButton("Connect");
@@ -125,7 +125,9 @@ public class ViewGUI extends JFrame{
                 getContentPane().remove(connectButton);
                 setSize(800, 600);
                 setVisible(true);
-            }else
+            }else if(error.contains("sqlState: 2800"))
+                displayDialog("Access denied. Incorrect password.");
+            else
                 displayDialog("Could not connect to the database\n" + error);
         }
     }
