@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -25,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -40,18 +42,47 @@ public class CurrentRentalsGUI extends JPanel{
 
     private JTable table;
     
+    // Controller swing..
     private JTextField customerField, employeeField;
     private JCheckBox currentOrders;
     private JCheckBox pastOrders;
+    private JButton moreInfo;
     
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
     
     public CurrentRentalsGUI() {
-        setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
-        add(initButtons(), BorderLayout.NORTH);
-        add(initTable(), BorderLayout.CENTER);
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        //add(initButtons(), BorderLayout.WEST);
+        add(initButtons(), c);
+        c.gridx = 1;
+        c.gridy = 0;
+        //add(initFiltering(), BorderLayout.NORTH);
+        add(initFiltering(), c);
+        c.gridx = 1;
+        c.gridy = 1;
+        //add(initTable(), BorderLayout.CENTER);
+        add(initTable(), c);
     }
     
+    /**
+     * fetches new table form database
+     *          -- fetches query from RentalOrderOptions
+     */
+    private void updateTable(){
+        try {
+            table.setModel(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+    } 
+    
+    //-----------------------------------
+    //            --- GUI ----
+    //-----------------------------------
+
     public JComponent initTable(){
         JScrollPane scrollPane = null;
         try {
@@ -65,7 +96,7 @@ public class CurrentRentalsGUI extends JPanel{
         return scrollPane;
     }
     
-    public JComponent initButtons(){
+    public JComponent initFiltering(){
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         panel.setBorder(new TitledBorder(new EtchedBorder(),"Filter results.."));
@@ -99,6 +130,23 @@ public class CurrentRentalsGUI extends JPanel{
         c.gridx=0;
         c.gridy=1;
         panel.add(pastOrders, c); 
+        
+        
+        
+        return panel;
+    }
+    
+    public JComponent initButtons(){
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        panel.setBorder(new TitledBorder(new EtchedBorder(),"Toolbar"));
+
+        moreInfo = new JButton("More info..");
+        moreInfo.addActionListener(new ButtonHandler());
+        c.gridx=0;
+        c.gridy=0;
+        panel.add(moreInfo, c);
+        
         return panel;
     }
    
@@ -109,6 +157,41 @@ public class CurrentRentalsGUI extends JPanel{
         size.height = 580;  
         return size;
     }
+    
+    //-----------------------------------
+    //       --- Event Handlers ----
+    //-----------------------------------
+    
+    private class ButtonHandler implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+           }
+        
+    }
+    
+    private class TableHandler implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ListSelectionModel model = (ListSelectionModel) e.getSource();
+
+            if (model.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = model.getMinSelectionIndex();
+                int maxIndex = model.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (model.isSelectedIndex(i)) {
+                        System.out.println(" " + i);
+                    }
+                }
+            }
+            System.out.println();
+        }
+    }
+
     
     private class CheckBoxHandler implements ItemListener{
 
@@ -166,13 +249,6 @@ public class CurrentRentalsGUI extends JPanel{
         
     }
     
-    private class TableHandler implements ListSelectionListener{
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            
-        }
-    }
-    
     private class HeaderHandler implements MouseListener{
 
         @Override
@@ -209,15 +285,6 @@ public class CurrentRentalsGUI extends JPanel{
             
         }
         
+        
     }
-    
-    private void updateTable(){
-        try {
-            table.setModel(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        }
-    }
-    
-    
 }
