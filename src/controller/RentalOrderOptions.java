@@ -30,6 +30,10 @@ public class RentalOrderOptions {
 	public void setCurrentOrders(boolean currentOrders) {
 		this.currentOrders = currentOrders;
 	}
+	
+	public void toggleCurrentOrders(){
+        this.currentOrders = !this.currentOrders;
+    }
 
 	public boolean getPastOrders() {
 		return pastOrders;
@@ -37,6 +41,10 @@ public class RentalOrderOptions {
 
 	public void setPastOrders(boolean pastOrders) {
 		this.pastOrders = pastOrders;
+	}
+	
+public void togglePastOrders(){
+	    this.pastOrders = !this.pastOrders;
 	}
 
 	public void setOrdering(Ordering o) {

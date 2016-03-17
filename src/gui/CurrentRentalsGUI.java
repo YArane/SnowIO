@@ -4,12 +4,20 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.ItemSelectable;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -33,6 +41,8 @@ public class CurrentRentalsGUI extends JPanel{
     private JTable table;
     
     private JTextField customerField, employeeField;
+    private JCheckBox currentOrders;
+    private JCheckBox pastOrders;
     
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
     
@@ -56,28 +66,62 @@ public class CurrentRentalsGUI extends JPanel{
     }
     
     public JComponent initButtons(){
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
         panel.setBorder(new TitledBorder(new EtchedBorder(),"Filter results.."));
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        JLabel customerLabel = new JLabel("Customer Name");
+        JLabel customerLabel = new JLabel("Customer Name:");
+        c.gridx=1;
+        c.gridy=0;
+        panel.add(customerLabel, c);
         customerField = new JTextField(20);
         customerField.getDocument().addDocumentListener(new CustomerFieldHandler());
-        panel.add(customerLabel, BorderLayout.NORTH);
-        panel.add(customerField);
-        JLabel employeeLabel = new JLabel("Employee Name");
+        c.gridx=1;
+        c.gridy=1;
+        panel.add(customerField, c);
+        JLabel employeeLabel = new JLabel("Employee Name:");
+        c.gridx=1;
+        c.gridy=2;
+        panel.add(employeeLabel, c);
         employeeField = new JTextField(20);
         employeeField.getDocument().addDocumentListener(new EmployeeFieldHandler());
-        panel.add(employeeLabel, BorderLayout.NORTH);
-        panel.add(employeeField);
+        c.gridx=1;
+        c.gridy=3;
+        panel.add(employeeField, c);
+        
+        currentOrders = new JCheckBox("Current Orders", true);
+        currentOrders.addItemListener(new CheckBoxHandler());
+        c.gridx=0;
+        c.gridy=0;
+        panel.add(currentOrders, c);
+        
+        pastOrders = new JCheckBox("Past Orders", true);
+        pastOrders.addItemListener(new CheckBoxHandler());
+        c.gridx=0;
+        c.gridy=1;
+        panel.add(pastOrders, c); 
         return panel;
     }
-    
+   
     @Override
     public Dimension getPreferredSize(){
         Dimension size = super.getPreferredSize();
         size.width = 780;   
         size.height = 580;  
         return size;
+    }
+    
+    private class CheckBoxHandler implements ItemListener{
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+           ItemSelectable checkBox = e.getItemSelectable();
+           if(checkBox == currentOrders)
+               tableOptions.toggleCurrentOrders();
+           else if(checkBox == pastOrders)
+               tableOptions.togglePastOrders();
+           updateTable();
+        }
+        
     }
     
     private class CustomerFieldHandler implements DocumentListener{

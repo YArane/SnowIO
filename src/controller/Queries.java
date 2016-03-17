@@ -3,7 +3,7 @@ package controller;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import controller.CustomerOptions.RentalStatus;
+//import controller.CustomerOptions.RentalStatus;
 
 import database.JDBC;
 
@@ -86,7 +86,7 @@ public class Queries {
         return rs;
     }
     
-    public static ResultSet getCustomers(CustomerOptions options) {
+    /*public static ResultSet getCustomers(CustomerOptions options) {
     	JDBC jdbc = JDBC.getInstance();
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "
     							+ "FROM Customers C "
@@ -138,11 +138,11 @@ public class Queries {
     		rentalOrderQuery += "ORDER BY RO.Date_Out";
     		break;
     	}
-    	*/
+    	
     	customersQuery += ";";
         System.out.println(customersQuery);
     	ResultSet rs = jdbc.query(customersQuery);
     	
         return rs;
-    }
+    }*/
 }
