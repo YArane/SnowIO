@@ -11,6 +11,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -18,6 +20,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import controller.CustomerOptions;
 import controller.Queries;
 import controller.RentalOrderOptions;
 
@@ -77,6 +80,21 @@ public class NewRentalGUI extends JPanel {
         return size;
     }
 
+    public void showMessagePopup(String message) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints cp = new GridBagConstraints();
+        cp.gridx=1;
+        cp.gridy=0;
+        JLabel label = new JLabel(message);
+        panel.add(label, cp);
+
+        String[] options = new String[]{"Continue"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Create New Customer",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+
+    }
+
     public void showNewCustomerPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints cp = new GridBagConstraints();
@@ -92,6 +110,7 @@ public class NewRentalGUI extends JPanel {
                 "Cardholder Name", "Billing Address", "CVV"
         };
 
+        Map<String, JTextField> fieldMap = new HashMap<String, JTextField>();
         for (String fieldId: customerDataFields) {
             cp.gridy = cp.gridy + 1;
             JLabel fieldLabel = new JLabel(fieldId + ":");
@@ -101,12 +120,74 @@ public class NewRentalGUI extends JPanel {
             cp.gridx = 2;
             panel.add(newField, cp);
             cp.gridx = 1;
+            fieldMap.put(fieldId, newField);
         }
 
         String[] options = new String[]{"Create Customer", "Cancel"};
         int option = JOptionPane.showOptionDialog(null, panel, "Create New Customer",
                 JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, options[0]);
+
+
+        if (option == 0) { // Create Account
+            CustomerOptions customerOpts = new CustomerOptions();
+
+            boolean emptyFieldFound = false;
+            for (JTextField tfield : fieldMap.values()) {
+
+                if (tfield.getText().equals("")) {
+                    emptyFieldFound = true;
+                    break;
+                }
+
+                switch (tfield.getName()) {
+                    case "Customer Name":
+                        customerOpts.setCustomerName(tfield.getText());
+                        break;
+                    case "Customer Address":
+                        customerOpts.setCustomerAddress(tfield.getText());
+                        break;
+                    case "Customer Age":
+                        customerOpts.setCustomerAge(tfield.getText());
+                        break;
+                    case "Phone Number":
+                        customerOpts.setCustomerPhone(tfield.getText());
+                        break;
+                    case "Weight":
+                        customerOpts.setWeight(tfield.getText());
+                        break;
+                    case "Height":
+                        customerOpts.setHeight(tfield.getText());
+                        break;
+                    case "Credit Card Number":
+                        customerOpts.setCreditCardNumber(tfield.getText());
+                        break;
+                    case "Credit Card Type":
+                        customerOpts.setCreditCardType(tfield.getText());
+                        break;
+                    case "Cardholder Name":
+                        customerOpts.setCardholderName(tfield.getText());
+                        break;
+                    case "Billing Address":
+                        customerOpts.setBillingAddress(tfield.getText());
+                        break;
+                    case "CVV":
+                        customerOpts.setCVV(tfield.getText());
+                        break;
+                    default:
+                        System.out.println("Something is wrong!");
+                }
+            }
+
+            // TODO: there is no error handling in place! We need to refactor the JDBC endpoints
+            // TODO: There is no way to know if an insert doesn't work
+            if (!emptyFieldFound) {
+                String insertResult = Queries.insertNewCustomer(customerOpts);
+                showMessagePopup("New customer insertion result: " + insertResult);
+            } else {
+                showMessagePopup("Customer account could not be created. Please fill out all fields.");
+            }
+        }
     }
 
     //-----------------------------------

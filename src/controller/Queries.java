@@ -85,7 +85,34 @@ public class Queries {
        
         return rs;
     }
-    
+
+	public static String insertNewCustomer(CustomerOptions newCustomer) {
+		String billingInserResult = insertNewBillingInfoData(newCustomer);
+		System.out.println("Billing Insert Res:" + billingInserResult);
+
+		JDBC jdbc = JDBC.getInstance();
+
+		String insertCustomerQuery = "INSERT INTO Customers (name, address, credit_card_number, phone_number, age, weight_kg, height_cm) "
+								   + "VALUES ('" + newCustomer.getCustomerName() + "', '" + newCustomer.getCustomerAddress()
+								   + "', '" + newCustomer.getCreditCardNumber() + "', '" + newCustomer.getCustomerPhone()
+				    			   + "', '" + newCustomer.getCustomerAge() + "', '" + newCustomer.getWeight()
+								   + "', '" + newCustomer.getHeight() + "');";
+
+		return jdbc.update(insertCustomerQuery);
+	}
+
+	private static String insertNewBillingInfoData(CustomerOptions newCustomer) {
+		JDBC jdbc = JDBC.getInstance();
+		String insertBillingInfoQuery = "INSERT INTO BillingInformation "
+									  + "VALUES ('" + newCustomer.getCreditCardNumber() + "', '"
+									  + newCustomer.getCardholderName() + "', '"
+				 					  + newCustomer.getCreditCardType() + "', '"
+									  + newCustomer.getBillingAddress() + "', '"
+		   						      + newCustomer.getCVV() + "');";
+
+		return jdbc.update(insertBillingInfoQuery);
+	}
+
     /*public static ResultSet getCustomers(CustomerOptions options) {
     	JDBC jdbc = JDBC.getInstance();
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "
