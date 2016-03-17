@@ -3,6 +3,7 @@ package gui;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +17,7 @@ public class TableGUI {
         // names of columns
         Vector<String> columnNames = new Vector<String>();
         int columnCount = metaData.getColumnCount();
-        for (int column = 2; column <= columnCount; column++) {
+        for (int column = 1; column <= columnCount; column++) {
             columnNames.add(metaData.getColumnName(column));
         }
 
@@ -24,7 +25,7 @@ public class TableGUI {
         Vector<Vector<Object>> data = new Vector<Vector<Object>>();
         while (rs.next()) {
             Vector<Object> vector = new Vector<Object>();
-            for (int columnIndex = 2; columnIndex <= columnCount; columnIndex++) {
+            for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
                 vector.add(rs.getObject(columnIndex));
             }
             data.add(vector);

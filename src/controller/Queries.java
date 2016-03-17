@@ -113,6 +113,18 @@ public class Queries {
 		return jdbc.update(insertBillingInfoQuery);
 	}
 
+	public static ResultSet getCustomers() {
+		JDBC jdbc = JDBC.getInstance();
+		String getCustomersQuery = "SELECT * FROM Customers";
+		return jdbc.query(getCustomersQuery);
+	}
+
+	public static ResultSet getCustomers(String searchName) {
+		JDBC jdbc = JDBC.getInstance();
+		String getCustomersQuery = "SELECT * FROM Customers WHERE Name Like '%" + searchName + "%';";
+		return jdbc.query(getCustomersQuery);
+	}
+
     /*public static ResultSet getCustomers(CustomerOptions options) {
     	JDBC jdbc = JDBC.getInstance();
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "

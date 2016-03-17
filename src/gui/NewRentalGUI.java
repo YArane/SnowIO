@@ -10,6 +10,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import controller.CustomerOptions;
 import controller.Queries;
@@ -29,7 +32,17 @@ public class NewRentalGUI extends JPanel {
     private JTable table;
 
     // Controller swing
-    private JButton createNewCustomer;
+    private JButton createNewCustomer, lookUpCustomer;
+
+    // Global for table search
+    private JTextField customerNameField;
+
+    // Global used to store the rows for the tables used in the views
+    private ResultSet customerTuples;
+    private ResultSet itemTuples;
+
+    // Used Keep track of the Customer selected by the user
+    private int selectedCustomerID;
 
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
 
@@ -46,9 +59,14 @@ public class NewRentalGUI extends JPanel {
      * fetches new table form database
      *          -- fetches query from RentalOrderOptions
      */
-    private void updateTable(){
+    private void updateTable(String searchQuery){
         try {
-            table.setModel(TableGUI.buildTableModel(Queries.getRentalOrders(tableOptions)));
+            if (searchQuery == null) {
+                customerTuples = Queries.getCustomers();
+            } else {
+                customerTuples = Queries.getCustomers(searchQuery);
+            }
+            table.setModel(TableGUI.buildTableModel(customerTuples));
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
@@ -68,6 +86,11 @@ public class NewRentalGUI extends JPanel {
         c.gridx=0;
         c.gridy=0;
         panel.add(createNewCustomer, c);
+
+        lookUpCustomer = new JButton("Look Up Existing Customer");
+        lookUpCustomer.addActionListener(new ButtonHandler());
+        c.gridy=1;
+        panel.add(lookUpCustomer, c);
 
         return panel;
     }
@@ -95,7 +118,7 @@ public class NewRentalGUI extends JPanel {
 
     }
 
-    public void showNewCustomerPanel() {
+    private void showNewCustomerPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints cp = new GridBagConstraints();
         cp.gridx=1;
@@ -190,6 +213,64 @@ public class NewRentalGUI extends JPanel {
         }
     }
 
+    private void showExistingCustomerList() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints cp = new GridBagConstraints();
+        cp.gridx=1;
+        cp.gridy=0;
+        JLabel label = new JLabel("Click on the customer who is placing a rental");
+        panel.add(label, cp);
+
+        JLabel customerNameLabel = new JLabel("Customer Name:");
+        cp.gridy=1;
+        panel.add(customerNameLabel, cp);
+        cp.gridx=2;
+        customerNameField = new JTextField(20);
+        customerNameField.getDocument().addDocumentListener(new CustomerFieldHandler());
+        panel.add(customerNameField, cp);
+
+        cp.gridy=2;
+        panel.add(initTable(), cp);
+
+        String[] options = new String[]{"Continue", "Cancel"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Registered Customers",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+
+        if (option == 0) { // Continue
+            showItemsAvailableForRent();
+        }
+    }
+
+    private void showItemsAvailableForRent() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints cp = new GridBagConstraints();
+        cp.gridx=1;
+        cp.gridy=0;
+        JLabel label = new JLabel("Select the items that are being rented");
+        panel.add(label, cp);
+
+        String[] options = new String[]{"Place Rental", "Cancel"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Rental Items Menu",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+
+
+    }
+
+    public JComponent initTable(){
+        JScrollPane scrollPane = null;
+        try {
+            customerTuples = Queries.getCustomers();
+            table = new JTable(TableGUI.buildTableModel(Queries.getCustomers()));
+            table.getSelectionModel().addListSelectionListener(new TableHandler());
+            scrollPane = new JScrollPane(table);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return scrollPane;
+    }
+
     //-----------------------------------
     //       --- Event Handlers ----
     //-----------------------------------
@@ -202,8 +283,50 @@ public class NewRentalGUI extends JPanel {
             System.out.println(e.getActionCommand());
             if (e.getActionCommand().equals("Create New Customer")) {
                 showNewCustomerPanel();
+            } else if (e.getActionCommand().equals("Look Up Existing Customer")) {
+                showExistingCustomerList();
+            }
+
+        }
+    }
+
+    private class TableHandler implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ListSelectionModel model = (ListSelectionModel) e.getSource();
+
+            if (model.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = model.getMinSelectionIndex();
+                int maxIndex = model.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (model.isSelectedIndex(i)) {
+                        selectedCustomerID = (int) table.getValueAt(i,0);
+                    }
+                }
             }
         }
+    }
+
+    private class CustomerFieldHandler implements DocumentListener{
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            updateTable(customerNameField.getText());
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            updateTable(customerNameField.getText());
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            // TODO Auto-generated method stub
+        }
+
     }
 
 }
