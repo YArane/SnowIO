@@ -60,6 +60,9 @@ public class CustomerOptions {
 		address = "";
 		phone = "";
 		credit_card_number = "";
+		age = "";
+		weight = "";
+		height = "";
 		rentalStatus = RentalStatus.ALL;
 	}
 	

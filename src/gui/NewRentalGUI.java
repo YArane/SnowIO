@@ -25,7 +25,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import com.sun.tools.javac.util.Name;
+//import com.sun.tools.javac.util.Name;
 
 import controller.BillingInfoOptions;
 import controller.CustomerOptions;

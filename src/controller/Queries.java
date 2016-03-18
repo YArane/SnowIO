@@ -9,8 +9,6 @@ import java.util.jar.Pack200;
 
 import controller.CustomerOptions.RentalStatus;
 
-//import controller.CustomerOptions.RentalStatus;
-
 import database.JDBC;
 
 public class Queries {

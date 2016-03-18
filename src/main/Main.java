@@ -1,6 +1,5 @@
 package main;
 
-import gui.ignore;
 import gui.ViewGUI;
 
 import java.awt.FlowLayout;
