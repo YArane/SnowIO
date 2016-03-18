@@ -125,6 +125,64 @@ public class Queries {
 		return jdbc.query(getCustomersQuery);
 	}
 
+	public static ResultSet getItemsForRent() {
+		JDBC jdbc = JDBC.getInstance();
+		String getCustomersQuery = "SELECT * FROM Items;";
+		return jdbc.query(getCustomersQuery);
+	}
+
+	public static ResultSet getBootsForRent() {
+		JDBC jdbc = JDBC.getInstance();
+		String getPolesForRentQuery = "SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.size, s.strap "
+									+ "FROM Items i "
+									+ "INNER JOIN Models m ON m.Model_ID = i.Model_ID "
+									+ "LEFT JOIN ItemRentals ir ON ir.Item_ID = i.Item_ID "
+									+ "LEFT JOIN RentalOrders r ON r.Rental_Order_ID = ir.Rental_Order_ID "
+									+ "RIGHT JOIN Boots s ON s.item_id = ir.item_id "
+									+ "WHERE r.Date_In IS NOT NULL "
+									+ "AND i.Out_Of_Service = 'f' "
+									+ "AND NOT i.Condition = 'Poor';";
+		return jdbc.query(getPolesForRentQuery);
+	}
+
+	public static ResultSet getPolesForRent() {
+		JDBC jdbc = JDBC.getInstance();
+		String getPolesForRentQuery = "SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type "
+									+ "FROM Items i "
+									+ "INNER JOIN Models m ON m.Model_ID = i.Model_ID "
+									+ "LEFT JOIN ItemRentals ir ON ir.Item_ID = i.Item_ID "
+									+ "LEFT JOIN RentalOrders r ON r.Rental_Order_ID = ir.Rental_Order_ID "
+									+ "RIGHT JOIN Poles s ON s.item_id = ir.item_id "
+									+ "WHERE r.Date_In IS NOT NULL "
+									+ "AND i.Out_Of_Service = 'f' "
+									+ "AND NOT i.Condition = 'Poor';";
+		return jdbc.query(getPolesForRentQuery);
+	}
+
+	public static ResultSet getSkisForRent() {
+		JDBC jdbc = JDBC.getInstance();
+		String getSkisForRentQuery = "SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type, s.bindings "
+								   + "FROM Items i "
+				  				   + "INNER JOIN Models m ON m.Model_ID = i.Model_ID "
+				                   + "LEFT JOIN ItemRentals ir ON ir.Item_ID = i.Item_ID "
+				  				   + "LEFT JOIN RentalOrders r ON r.Rental_Order_ID = ir.Rental_Order_ID "
+				  				   + "RIGHT JOIN Skis s ON s.item_id = ir.item_id "
+								   + "WHERE r.Date_In IS NOT NULL "
+								   + "AND i.Out_Of_Service = 'f' "
+								   + "AND NOT i.Condition = 'Poor';";
+		return jdbc.query(getSkisForRentQuery);
+	}
+
+	public static String insertRentalOrder(RentalOrderOptions rentalOrderOpts) {
+		JDBC jdbc = JDBC.getInstance();
+		String insertRentalOrderQuery = "INSERT INTO RentalOrders (employee_id, customer_id, date_out, total_price) "
+									  + "VALUES ('" + rentalOrderOpts.getEmployeeID()
+									  + "', '" + rentalOrderOpts.getCustomerID()
+									  + "', '" + rentalOrderOpts.getDateOut()
+				 					  + "', '" + rentalOrderOpts.getTotalPrice() + "');";
+		return jdbc.update(insertRentalOrderQuery);
+	}
+
     /*public static ResultSet getCustomers(CustomerOptions options) {
     	JDBC jdbc = JDBC.getInstance();
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "

@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import controller.CustomerOptions;
 import controller.Queries;
@@ -29,7 +31,7 @@ import controller.RentalOrderOptions;
 
 public class NewRentalGUI extends JPanel {
 
-    private JTable table;
+    private JTable table, bootsTable, polesTable, skisTable;
 
     // Controller swing
     private JButton createNewCustomer, lookUpCustomer;
@@ -38,13 +40,18 @@ public class NewRentalGUI extends JPanel {
     private JTextField customerNameField;
 
     // Global used to store the rows for the tables used in the views
-    private ResultSet customerTuples;
-    private ResultSet itemTuples;
+    private ResultSet customerTuples, bootTuples, skiTuples, poleTuples;
 
     // Used Keep track of the Customer selected by the user
     private int selectedCustomerID;
+    private ArrayList<Integer> bootsToBeRented = new ArrayList<>();
+    private ArrayList<Integer> skisToBeRented = new ArrayList<>();
+    private ArrayList<Integer> polesToBeRented = new ArrayList<>();
 
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
+
+    // Used to determine the type of table to be displayed
+    private enum TableType {CUSTOMERS, BOOTSFORRENT, POLESFORRENT, SKISFORRENT};
 
     public NewRentalGUI() {
         setLayout(new GridBagLayout());
@@ -230,7 +237,7 @@ public class NewRentalGUI extends JPanel {
         panel.add(customerNameField, cp);
 
         cp.gridy=2;
-        panel.add(initTable(), cp);
+        panel.add(initTable(TableType.CUSTOMERS), cp);
 
         String[] options = new String[]{"Continue", "Cancel"};
         int option = JOptionPane.showOptionDialog(null, panel, "Registered Customers",
@@ -250,21 +257,116 @@ public class NewRentalGUI extends JPanel {
         JLabel label = new JLabel("Select the items that are being rented");
         panel.add(label, cp);
 
+        cp.gridy=2;
+        cp.gridx=1;
+        panel.add(initTable(TableType.SKISFORRENT), cp);
+
+        cp.gridx=2;
+        panel.add(initTable(TableType.POLESFORRENT), cp);
+
+        cp.gridx=3;
+        panel.add(initTable(TableType.BOOTSFORRENT), cp);
+
         String[] options = new String[]{"Place Rental", "Cancel"};
         int option = JOptionPane.showOptionDialog(null, panel, "Rental Items Menu",
                 JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, options[0]);
 
-
+        if (option == 0) {
+            showRentalOrderOptionsMenu();
+        }
     }
 
-    public JComponent initTable(){
+    private void showRentalOrderOptionsMenu() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints cp = new GridBagConstraints();
+        cp.gridx=1;
+        cp.gridy=0;
+        JLabel label = new JLabel("Enter the information shown below to place the rental order");
+        panel.add(label, cp);
+
+        String[] rentalOrderDataFields = new String[] {
+                "Employee ID", "Date Out", "Total Price"
+        };
+
+        Map<String, JTextField> fieldMap = new HashMap<String, JTextField>();
+        for (String fieldId: rentalOrderDataFields) {
+            cp.gridy = cp.gridy + 1;
+            JLabel fieldLabel = new JLabel(fieldId + ":");
+            panel.add(fieldLabel, cp);
+            JTextField newField = new JTextField(20);
+            newField.setName(fieldId);
+            cp.gridx = 2;
+            panel.add(newField, cp);
+            cp.gridx = 1;
+            fieldMap.put(fieldId, newField);
+        }
+
+        String[] options = new String[]{"Place Rental Order", "Cancel"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Create New Customer",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+
+        if (option == 0) {
+            RentalOrderOptions rentalOrderOpts = new RentalOrderOptions();
+            boolean emptyFieldFound = false;
+            for (JTextField tfield : fieldMap.values()) {
+
+                if (tfield.getText().equals("")) {
+                    emptyFieldFound = true;
+                    break;
+                }
+
+                switch (tfield.getName()) {
+                    case "Employee ID":
+                        rentalOrderOpts.setEmployeeID(tfield.getText());
+                        break;
+                    case "Date Out":
+                        rentalOrderOpts.setDateOut(tfield.getText());
+                        break;
+                    case "Total Price":
+                        rentalOrderOpts.setTotalPrice(tfield.getText());
+                        break;
+                    default:
+                        System.out.println("Something is wrong!");
+                }
+            }
+
+            rentalOrderOpts.setCustomerID(Integer.toString(selectedCustomerID));
+
+            if (!emptyFieldFound) {
+                String insertResult = Queries.insertRentalOrder(rentalOrderOpts);
+                showMessagePopup("New customer insertion result: " + insertResult);
+            } else {
+                showMessagePopup("Customer account could not be created. Please fill out all fields.");
+            }
+        }
+    }
+
+    public JComponent initTable(TableType tableType){
         JScrollPane scrollPane = null;
         try {
-            customerTuples = Queries.getCustomers();
-            table = new JTable(TableGUI.buildTableModel(Queries.getCustomers()));
-            table.getSelectionModel().addListSelectionListener(new TableHandler());
-            scrollPane = new JScrollPane(table);
+            if (tableType == TableType.CUSTOMERS) {
+                customerTuples = Queries.getCustomers();
+                table = new JTable(TableGUI.buildTableModel(customerTuples));
+                table.getSelectionModel().addListSelectionListener(new CustomerTableHandler());
+                scrollPane = new JScrollPane(table);
+            } else if (tableType == TableType.BOOTSFORRENT) {
+                bootTuples = Queries.getBootsForRent();
+                bootsTable = new JTable(TableGUI.buildTableModel(bootTuples));
+                bootsTable.getSelectionModel().addListSelectionListener(new BootsTableHandler());
+                scrollPane = new JScrollPane(bootsTable);
+            } else if (tableType == TableType.POLESFORRENT) {
+                poleTuples = Queries.getPolesForRent();
+                polesTable = new JTable(TableGUI.buildTableModel(poleTuples));
+                polesTable.getSelectionModel().addListSelectionListener(new PolesTableHandler());
+                scrollPane = new JScrollPane(polesTable);
+            } else if (tableType == TableType.SKISFORRENT) {
+                skiTuples = Queries.getSkisForRent();
+                skisTable = new JTable(TableGUI.buildTableModel(skiTuples));
+                skisTable.getSelectionModel().addListSelectionListener(new SkisTableHandler());
+                scrollPane = new JScrollPane(skisTable);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -290,7 +392,7 @@ public class NewRentalGUI extends JPanel {
         }
     }
 
-    private class TableHandler implements ListSelectionListener {
+    private class CustomerTableHandler implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             ListSelectionModel model = (ListSelectionModel) e.getSource();
@@ -307,6 +409,67 @@ public class NewRentalGUI extends JPanel {
                     }
                 }
             }
+        }
+    }
+
+    private class BootsTableHandler implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ListSelectionModel model = (ListSelectionModel) e.getSource();
+            if (model.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = model.getMinSelectionIndex();
+                int maxIndex = model.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (model.isSelectedIndex(i)) {
+                        bootsToBeRented.add((int) bootsTable.getValueAt(i,0));
+                        ((DefaultTableModel) bootsTable.getModel()).removeRow(i);
+                    }
+                }
+            }
+        }
+    }
+
+    private class SkisTableHandler implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ListSelectionModel model = (ListSelectionModel) e.getSource();
+            if (model.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = model.getMinSelectionIndex();
+                int maxIndex = model.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (model.isSelectedIndex(i)) {
+                        skisToBeRented.add((int) skisTable.getValueAt(i,0));
+                        ((DefaultTableModel) skisTable.getModel()).removeRow(i);
+                    }
+                }
+            }
+        }
+    }
+
+    private class PolesTableHandler implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ListSelectionModel model = (ListSelectionModel) e.getSource();
+            if (model.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = model.getMinSelectionIndex();
+                int maxIndex = model.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (model.isSelectedIndex(i)) {
+                        polesToBeRented.add((int) polesTable.getValueAt(i,0));
+                        ((DefaultTableModel) polesTable.getModel()).removeRow(i);
+                    }
+                }
+            }
+
         }
     }
 

@@ -12,6 +12,10 @@ public class RentalOrderOptions {
 	private Ordering ordering;
 	private String employee_name;
 	private String customer_name;
+	private String employeeID;
+	private String customerID;
+	private String totalPrice;
+	private String dateOut;
 	private boolean pastOrders;
 	private boolean currentOrders;
 	
@@ -21,6 +25,30 @@ public class RentalOrderOptions {
 		customer_name = "";
 		pastOrders = true;
 		currentOrders = true;
+	}
+
+	public String getEmployeeID() {
+		return employeeID;
+	}
+
+	public void setEmployeeID(String employeeID) {
+		this.employeeID = employeeID;
+	}
+
+	public String getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(String totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+
+	public String getDateOut() {
+		return dateOut;
+	}
+
+	public void setDateOut(String dateOut) {
+		this.dateOut = dateOut;
 	}
 	
 	public boolean getCurrentOrders() {
@@ -42,8 +70,16 @@ public class RentalOrderOptions {
 	public void setPastOrders(boolean pastOrders) {
 		this.pastOrders = pastOrders;
 	}
+
+	public String getCustomerID() {
+		return customerID;
+	}
+
+	public void setCustomerID(String customerID) {
+		this.customerID = customerID;
+	}
 	
-public void togglePastOrders(){
+	public void togglePastOrders(){
 	    this.pastOrders = !this.pastOrders;
 	}
 
