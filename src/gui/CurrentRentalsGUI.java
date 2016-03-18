@@ -33,6 +33,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
 
 import controller.Queries;
 import controller.RentalOrderOptions;
@@ -47,6 +48,7 @@ public class CurrentRentalsGUI extends JPanel{
     private JCheckBox currentOrders;
     private JCheckBox pastOrders;
     private JButton moreInfo;
+    private int currentRowSelection = -1;
     
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
     
@@ -95,7 +97,16 @@ public class CurrentRentalsGUI extends JPanel{
         }        
         return scrollPane;
     }
-    
+
+    public JComponent initTable(TableModel tableModel){
+        JScrollPane scrollPane = null;
+        JTable table = new JTable(tableModel);
+        table.getSelectionModel().addListSelectionListener(new TableHandler());
+        table.getTableHeader().addMouseListener(new HeaderHandler());
+        scrollPane = new JScrollPane(table);        
+        return scrollPane;
+    } 
+
     public JComponent initFiltering(){
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -131,8 +142,6 @@ public class CurrentRentalsGUI extends JPanel{
         c.gridy=1;
         panel.add(pastOrders, c); 
         
-        
-        
         return panel;
     }
     
@@ -150,13 +159,13 @@ public class CurrentRentalsGUI extends JPanel{
         return panel;
     }
    
-    @Override
+    /*@Override
     public Dimension getPreferredSize(){
         Dimension size = super.getPreferredSize();
         size.width = 780;   
         size.height = 580;  
         return size;
-    }
+    }*/
     
     //-----------------------------------
     //       --- Event Handlers ----
@@ -166,8 +175,25 @@ public class CurrentRentalsGUI extends JPanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            
-           }
+            switch(e.getActionCommand()){
+                case "More info..":
+                    JPanel panel = new JPanel();
+                    try {
+                        String id = table.getValueAt(currentRowSelection, 0) + "";
+                        System.out.println("ID: " + id);
+                        panel.add(initTable(TableGUI.buildTableModel(Queries.getPolesInRentalOrder(table.getValueAt(currentRowSelection,  0)+ ""), true)));
+                        panel.add(initTable(TableGUI.buildTableModel(Queries.getSkisInRentalOrder(table.getValueAt(currentRowSelection,  0)+ ""), true)));
+                        panel.add(initTable(TableGUI.buildTableModel(Queries.getBootsInRentalOrder(table.getValueAt(currentRowSelection,  0)+ ""),true)));
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
+                    Object[] options = {"OK"};
+                    int option = JOptionPane.showOptionDialog(null, panel, "Items Rented",
+                            JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                            null, options, options[0]);
+                    
+            }
+        }
         
     }
     
@@ -177,18 +203,17 @@ public class CurrentRentalsGUI extends JPanel{
             ListSelectionModel model = (ListSelectionModel) e.getSource();
 
             if (model.isSelectionEmpty()) {
-                System.out.println(" <none>");
+                currentRowSelection = -1;
             } else {
                 // Find out which indexes are selected.
                 int minIndex = model.getMinSelectionIndex();
                 int maxIndex = model.getMaxSelectionIndex();
                 for (int i = minIndex; i <= maxIndex; i++) {
                     if (model.isSelectedIndex(i)) {
-                        System.out.println(" " + i);
+                        currentRowSelection = i;
                     }
                 }
             }
-            System.out.println();
         }
     }
 
