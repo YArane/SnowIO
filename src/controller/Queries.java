@@ -141,7 +141,6 @@ public class Queries {
 								   + "', '" + newCustomer.getCreditCardNumber() + "', '" + newCustomer.getPhone()
 				    			   + "', '" + newCustomer.getAge() + "', '" + newCustomer.getWeight()
 								   + "', '" + newCustomer.getHeight() + "');";
-
 		return jdbc.update(insertCustomerQuery);
 	}
 
@@ -153,7 +152,6 @@ public class Queries {
 				 					  + newBillingInfo.getType() + "', '"
 									  + newBillingInfo.getAddress() + "', '"
 		   						      + newBillingInfo.getCVV() + "');";
-
 		return jdbc.update(insertBillingInfoQuery);
 	}
 

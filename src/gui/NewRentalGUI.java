@@ -191,6 +191,7 @@ public class NewRentalGUI extends JPanel {
                         break;
                     case "Credit Card Number":
                         customerOpts.setCreditCardNumber(tfield.getText());
+                        billingOpts.setCreditCardNumber(tfield.getText());
                         break;
                     case "Credit Card Type":
                         billingOpts.setType(tfield.getText());
