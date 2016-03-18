@@ -295,11 +295,11 @@ public class Queries {
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price::decimal) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "
     							+ "FROM Customers C "
     							+ "INNER JOIN BillingInformation BI ON BI.Credit_Card_Number = C.Credit_Card_Number "
-    							+ "INNER JOIN RentalOrders RO ON C.Customer_ID = RO.Customer_ID "
+    							+ "LEFT JOIN RentalOrders RO ON C.Customer_ID = RO.Customer_ID "
     							+ "INNER JOIN ("
     							+ "(SELECT C.Customer_ID, 'Yes' AS Has_Rental_Order FROM RentalOrders RO LEFT JOIN Customers C ON C.Customer_ID = RO.Customer_ID AND C.Customer_ID IS NOT NULL GROUP BY C.Customer_ID)"
     							+ " UNION "
-    							+ "(SELECT C.Customer_ID, 'No' AS Has_Rental_Order FROM RentalOrders RO LEFT JOIN Customers C ON C.Customer_ID = RO.Customer_ID AND C.Customer_ID IS NULL GROUP BY C.Customer_ID)"
+    							+ "(SELECT C.Customer_ID, 'No' AS Has_Rental_Order FROM Customers C LEFT JOIN RentalOrders RO ON C.Customer_ID = RO.Customer_ID WHERE RO.Customer_ID IS NULL GROUP BY C.Customer_ID)"
     							+ ") HRO ON HRO.Customer_ID = C.Customer_ID ";
     	
        	// OPTIONS
