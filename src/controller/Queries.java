@@ -3,6 +3,8 @@ package controller;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import controller.CustomerOptions.RentalStatus;
+
 //import controller.CustomerOptions.RentalStatus;
 
 import database.JDBC;
@@ -127,7 +129,8 @@ public class Queries {
     }
     
     
-
+/*  We can't do it like this, CustomerOptions shouldn't contains stuff like credit card type, that goes in BillingInfo options
+ * 
 	public static String insertNewCustomer(CustomerOptions newCustomer) {
 		String billingInserResult = insertNewBillingInfoData(newCustomer);
 		System.out.println("Billing Insert Res:" + billingInserResult);
@@ -135,31 +138,26 @@ public class Queries {
 		JDBC jdbc = JDBC.getInstance();
 
 		String insertCustomerQuery = "INSERT INTO Customers (name, address, credit_card_number, phone_number, age, weight_kg, height_cm) "
-								   + "VALUES ('" + newCustomer.getCustomerName() + "', '" + newCustomer.getCustomerAddress()
-								   + "', '" + newCustomer.getCreditCardNumber() + "', '" + newCustomer.getCustomerPhone()
-				    			   + "', '" + newCustomer.getCustomerAge() + "', '" + newCustomer.getWeight()
+								   + "VALUES ('" + newCustomer.getName() + "', '" + newCustomer.getAddress()
+								   + "', '" + newCustomer.getCreditCardNumber() + "', '" + newCustomer.getPhone()
+				    			   + "', '" + newCustomer.getAge() + "', '" + newCustomer.getWeight()
 								   + "', '" + newCustomer.getHeight() + "');";
 
 		return jdbc.update(insertCustomerQuery);
 	}
 
-	private static String insertNewBillingInfoData(CustomerOptions newCustomer) {
+	private static String insertNewBillingInfoData(BillingInfoOptions newBillingInfo) {
 		JDBC jdbc = JDBC.getInstance();
 		String insertBillingInfoQuery = "INSERT INTO BillingInformation "
-									  + "VALUES ('" + newCustomer.getCreditCardNumber() + "', '"
-									  + newCustomer.getCardholderName() + "', '"
-				 					  + newCustomer.getCreditCardType() + "', '"
-									  + newCustomer.getBillingAddress() + "', '"
-		   						      + newCustomer.getCVV() + "');";
+									  + "VALUES ('" + newBillingInfo.getCreditCardNumber() + "', '"
+									  + newBillingInfo.getCardholderName() + "', '"
+				 					  + newBillingInfo.getCreditCardType() + "', '"
+									  + newBillingInfo.getBillingAddress() + "', '"
+		   						      + newBillingInfo.getCVV() + "');";
 
 		return jdbc.update(insertBillingInfoQuery);
 	}
-
-	public static ResultSet getCustomers() {
-		JDBC jdbc = JDBC.getInstance();
-		String getCustomersQuery = "SELECT * FROM Customers";
-		return jdbc.query(getCustomersQuery);
-	}
+	*/
 
 	public static ResultSet getCustomers(String searchName) {
 		JDBC jdbc = JDBC.getInstance();
@@ -225,7 +223,7 @@ public class Queries {
 		return jdbc.update(insertRentalOrderQuery);
 	}
 
-    /*public static ResultSet getCustomers(CustomerOptions options) {
+    public static ResultSet getCustomers(CustomerOptions options) {
     	JDBC jdbc = JDBC.getInstance();
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "
     							+ "FROM Customers C "
@@ -250,6 +248,36 @@ public class Queries {
     		}
     		whereClause += "C.Name LIKE '%" + options.getName() + "%' ";
     	}
+    	if(!options.getAge().equals("")) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "C.Age LIKE '%" + options.getAge() + "%' ";
+    	}
+    	if(!options.getPhone().equals("")) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "C.Phone_Number LIKE '%" + options.getPhone() + "%' ";
+    	}
+    	if(!options.getAddress().equals("")) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "C.Address LIKE '%" + options.getAddress() + "%' ";
+    	}
+    	if(!options.getWeight().equals("")) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "C.Weight_kg LIKE '%" + options.getWeight() + "%' ";
+    	}
+    	if(!options.getHeight().equals("")) {
+    		if(!whereClause.equals("")) {
+    			whereClause += "AND ";
+    		}
+    		whereClause += "C.Height_cm LIKE '%" + options.getHeight() + "%' ";
+    	}
     	if(!whereClause.equals("")) {
 			whereClause = "WHERE " + whereClause;
 		}    	
@@ -259,22 +287,33 @@ public class Queries {
     	customersQuery += "GROUP BY C.Customer_ID, BI.Credit_Card_Number, HRO.Has_Rental_Order ";
     	
     	// ORDERING
-		/*
     	switch(options.getOrdering()) {
-    	case CUSTOMER:
-    		rentalOrderQuery += "ORDER BY Customer_Name";
+    	case NAME:
+    		customersQuery += "ORDER BY C.Name";
     		break;
-    	case EMPLOYEE:
-    		rentalOrderQuery += "ORDER BY Employee_Name";
+    	case ADDRESS:
+    		customersQuery += "ORDER BY C.Address";
     		break;
-    	case TOTAL_PRICE:
-    		rentalOrderQuery += "ORDER BY RO.Total_Price";
+    	case PHONE:
+    		customersQuery += "ORDER BY C.Phone_Number";
     		break;
-    	case DATE_IN:
-    		rentalOrderQuery += "ORDER BY RO.Date_In";
+    	case AGE:
+    		customersQuery += "ORDER BY C.Age";
     		break;
-    	case DATE_OUT:
-    		rentalOrderQuery += "ORDER BY RO.Date_Out";
+    	case WEIGHT:
+    		customersQuery += "ORDER BY C.Weight_kg";
+    		break;
+    	case HEIGHT:
+    		customersQuery += "ORDER BY C.Height_cm";
+    		break;
+    	case RENTAL_STATUS:
+    		customersQuery += "ORDER BY HRO.Has_Rental_Order";
+    		break;
+    	case TOTAL_RENTALS:
+    		customersQuery += "ORDER BY Total_Rentals";
+    		break;
+    	case TOTAL_AMOUNT_PAID:
+    		customersQuery += "ORDER BY Total_Amount_Paid";
     		break;
     	}
     	
@@ -283,5 +322,5 @@ public class Queries {
     	ResultSet rs = jdbc.query(customersQuery);
     	
         return rs;
-    }*/
+    }
 }
