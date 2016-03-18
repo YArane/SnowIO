@@ -69,16 +69,8 @@ public class NewRentalGUI extends JPanel {
      * fetches new table form database
      *          -- fetches query from RentalOrderOptions
      */
-    private void updateTable(String searchQuery){
+    private void updateTable(CustomerOptions customerOpts){
         try {
-        	/*
-            if (searchQuery == null) {
-                customerTuples = Queries.getCustomers();
-            } else {
-                customerTuples = Queries.getCustomers(searchQuery);
-            }
-            */
-        	CustomerOptions customerOpts = new CustomerOptions();
             customerTuples = Queries.getCustomers(customerOpts);
             table.setModel(TableGUI.buildTableModel(customerTuples));
         } catch (SQLException e1) {
@@ -451,12 +443,16 @@ public class NewRentalGUI extends JPanel {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            updateTable(customerNameField.getText());
+        	CustomerOptions customerOpts = new CustomerOptions();
+        	customerOpts.setName(customerNameField.getText());
+            updateTable(customerOpts);
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            updateTable(customerNameField.getText());
+        	CustomerOptions customerOpts = new CustomerOptions();
+        	customerOpts.setName(customerNameField.getText());
+            updateTable(customerOpts);
         }
 
         @Override
