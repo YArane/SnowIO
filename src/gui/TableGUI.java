@@ -16,7 +16,7 @@ public class TableGUI {
         // names of columns
         Vector<String> columnNames = new Vector<String>();
         int columnCount = metaData.getColumnCount();
-        for (int column = 2; column <= columnCount; column++) {
+        for (int column = 1; column <= columnCount; column++) {
             columnNames.add(metaData.getColumnName(column));
         }
 
@@ -24,7 +24,31 @@ public class TableGUI {
         Vector<Vector<Object>> data = new Vector<Vector<Object>>();
         while (rs.next()) {
             Vector<Object> vector = new Vector<Object>();
-            for (int columnIndex = 2; columnIndex <= columnCount; columnIndex++) {
+            for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+                vector.add(rs.getObject(columnIndex));
+            }
+            data.add(vector);
+        }
+
+        return new DefaultTableModel(data, columnNames);
+    }
+    
+    public static DefaultTableModel buildTableModel(ResultSet rs, boolean item) throws SQLException {
+
+        ResultSetMetaData metaData = rs.getMetaData();
+
+        // names of columns
+        Vector<String> columnNames = new Vector<String>();
+        int columnCount = metaData.getColumnCount();
+        for (int column = 2; column <= columnCount-1; column++) {
+            columnNames.add(metaData.getColumnName(column));
+        }
+
+        // data of the table
+        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+        while (rs.next()) {
+            Vector<Object> vector = new Vector<Object>();
+            for (int columnIndex = 2; columnIndex <= columnCount-1; columnIndex++) {
                 vector.add(rs.getObject(columnIndex));
             }
             data.add(vector);

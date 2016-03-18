@@ -74,17 +74,59 @@ public class Queries {
         return rs;
     }
     
+    public static ResultSet getSkisInRentalOrder(String rentalOrderID){
+        JDBC jdbc = JDBC.getInstance();
+        String skisQuery = "Select * From skis JOIN (Select it.item_id FROM "
+                + "itemrentals it INNER JOIN items "
+                + "ON it.item_id = items.item_id "
+                + "Where rental_order_id = " + rentalOrderID + ") S "
+                + "ON skis.item_id = S.item_id";
+
+        System.out.println(skisQuery);
+        
+        return jdbc.query(skisQuery);
+    }
+    
+    public static ResultSet getBootsInRentalOrder(String rentalOrderID){
+        JDBC jdbc = JDBC.getInstance();
+        String bootsQuery = "Select * From boots JOIN (Select it.item_id FROM "
+                + "itemrentals it INNER JOIN items "
+                + "ON it.item_id = items.item_id "
+                + "Where rental_order_id = " + rentalOrderID + ") B "
+                + "ON boots.item_id = B.item_id";
+        
+        System.out.println(bootsQuery);
+        
+        return jdbc.query(bootsQuery);
+    }
+    
+    public static ResultSet getPolesInRentalOrder(String rentalOrderID){
+        JDBC jdbc = JDBC.getInstance();
+        String polesQuery = "Select * From poles JOIN (Select it.item_id FROM "
+                           + "itemrentals it INNER JOIN items "
+                           + "ON it.item_id = items.item_id "
+                           + "Where rental_order_id = " + rentalOrderID + ") P "
+                           + "ON poles.item_id = P.item_id";
+
+        System.out.println(polesQuery);
+        
+        return jdbc.query(polesQuery);
+    }
+    
     public static ResultSet getRentalOrderByID(String rentalOrderID) {
     	JDBC jdbc = JDBC.getInstance();
     	String rentalOrderQuery = "SELECT RO.Date_In, RO.Date_Out, E.Name AS Employee_Name, E.Type AS Employee_Type, C.Name AS Customer_Name, C.Address AS Customer_Address, C.Phone_Number AS Customer_Phone_Number "
-    							+ "FROM RentalOrders RO"
+    							+ "FROM RentalOrders RO "
     							+ "INNER JOIN Employees E ON E.Employee_ID = RO.Employee_ID "
     							+ "INNER JOIN Customers C ON C.Customer_ID = RO.Customer_ID "
     							+ "WHERE RO.Rental_Order_ID = '" + rentalOrderID + "';";
+    	System.out.println(rentalOrderQuery);
     	ResultSet rs = jdbc.query(rentalOrderQuery);
        
         return rs;
     }
+    
+    
 
 	public static String insertNewCustomer(CustomerOptions newCustomer) {
 		String billingInserResult = insertNewBillingInfoData(newCustomer);
