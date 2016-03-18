@@ -26,6 +26,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.sun.tools.javac.util.Name;
+
+import controller.BillingInfoOptions;
 import controller.CustomerOptions;
 import controller.Queries;
 import controller.RentalOrderOptions;
@@ -69,11 +71,15 @@ public class NewRentalGUI extends JPanel {
      */
     private void updateTable(String searchQuery){
         try {
+        	/*
             if (searchQuery == null) {
                 customerTuples = Queries.getCustomers();
             } else {
                 customerTuples = Queries.getCustomers(searchQuery);
             }
+            */
+        	CustomerOptions customerOpts = new CustomerOptions();
+            customerTuples = Queries.getCustomers(customerOpts);
             table.setModel(TableGUI.buildTableModel(customerTuples));
         } catch (SQLException e1) {
             e1.printStackTrace();
@@ -162,6 +168,7 @@ public class NewRentalGUI extends JPanel {
 
         if (option == 0) { // Create Account
             CustomerOptions customerOpts = new CustomerOptions();
+            BillingInfoOptions billingOpts = new BillingInfoOptions();
 
             boolean emptyFieldFound = false;
             for (JTextField tfield : fieldMap.values()) {
@@ -173,16 +180,16 @@ public class NewRentalGUI extends JPanel {
 
                 switch (tfield.getName()) {
                     case "Customer Name":
-                        customerOpts.setCustomerName(tfield.getText());
+                        customerOpts.setName(tfield.getText());
                         break;
                     case "Customer Address":
-                        customerOpts.setCustomerAddress(tfield.getText());
+                        customerOpts.setAddress(tfield.getText());
                         break;
                     case "Customer Age":
-                        customerOpts.setCustomerAge(tfield.getText());
+                        customerOpts.setAge(tfield.getText());
                         break;
                     case "Phone Number":
-                        customerOpts.setCustomerPhone(tfield.getText());
+                        customerOpts.setPhone(tfield.getText());
                         break;
                     case "Weight":
                         customerOpts.setWeight(tfield.getText());
@@ -194,16 +201,16 @@ public class NewRentalGUI extends JPanel {
                         customerOpts.setCreditCardNumber(tfield.getText());
                         break;
                     case "Credit Card Type":
-                        customerOpts.setCreditCardType(tfield.getText());
+                        billingOpts.setType(tfield.getText());
                         break;
                     case "Cardholder Name":
-                        customerOpts.setCardholderName(tfield.getText());
+                    	billingOpts.setName(tfield.getText());
                         break;
                     case "Billing Address":
-                        customerOpts.setBillingAddress(tfield.getText());
+                    	billingOpts.setAddress(tfield.getText());
                         break;
                     case "CVV":
-                        customerOpts.setCVV(tfield.getText());
+                    	billingOpts.setCVV(tfield.getText());
                         break;
                     default:
                         System.out.println("Something is wrong!");
@@ -213,7 +220,7 @@ public class NewRentalGUI extends JPanel {
             // TODO: there is no error handling in place! We need to refactor the JDBC endpoints
             // TODO: There is no way to know if an insert doesn't work
             if (!emptyFieldFound) {
-                String insertResult = Queries.insertNewCustomer(customerOpts);
+                String insertResult = Queries.insertNewCustomer(customerOpts, billingOpts);
                 showMessagePopup("New customer insertion result: " + insertResult);
             } else {
                 showMessagePopup("Customer account could not be created. Please fill out all fields.");
@@ -348,7 +355,8 @@ public class NewRentalGUI extends JPanel {
         JScrollPane scrollPane = null;
         try {
             if (tableType == TableType.CUSTOMERS) {
-                customerTuples = Queries.getCustomers();
+            	CustomerOptions customerOpts = new CustomerOptions();
+                customerTuples = Queries.getCustomers(customerOpts);
                 table = new JTable(TableGUI.buildTableModel(customerTuples));
                 table.getSelectionModel().addListSelectionListener(new TableHandler(TableType.CUSTOMERS));
                 scrollPane = new JScrollPane(table);

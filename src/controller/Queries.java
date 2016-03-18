@@ -128,11 +128,8 @@ public class Queries {
         return rs;
     }
     
-    
-/*  We can't do it like this, CustomerOptions shouldn't contains stuff like credit card type, that goes in BillingInfo options
- * 
-	public static String insertNewCustomer(CustomerOptions newCustomer) {
-		String billingInserResult = insertNewBillingInfoData(newCustomer);
+	public static String insertNewCustomer(CustomerOptions newCustomer, BillingInfoOptions newBillingInfo) {
+		String billingInserResult = insertNewBillingInfoData(newBillingInfo);
 		System.out.println("Billing Insert Res:" + billingInserResult);
 
 		JDBC jdbc = JDBC.getInstance();
@@ -150,14 +147,13 @@ public class Queries {
 		JDBC jdbc = JDBC.getInstance();
 		String insertBillingInfoQuery = "INSERT INTO BillingInformation "
 									  + "VALUES ('" + newBillingInfo.getCreditCardNumber() + "', '"
-									  + newBillingInfo.getCardholderName() + "', '"
-				 					  + newBillingInfo.getCreditCardType() + "', '"
-									  + newBillingInfo.getBillingAddress() + "', '"
+									  + newBillingInfo.getName() + "', '"
+				 					  + newBillingInfo.getType() + "', '"
+									  + newBillingInfo.getAddress() + "', '"
 		   						      + newBillingInfo.getCVV() + "');";
 
 		return jdbc.update(insertBillingInfoQuery);
 	}
-	*/
 
 	public static ResultSet getCustomers(String searchName) {
 		JDBC jdbc = JDBC.getInstance();
