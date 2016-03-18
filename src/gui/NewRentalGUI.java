@@ -47,9 +47,9 @@ public class NewRentalGUI extends JPanel {
 
     // Used Keep track of the Customer selected by the user
     private int selectedCustomerID;
-    private ArrayList<Integer> bootsToBeRented = new ArrayList<>();
-    private ArrayList<Integer> skisToBeRented = new ArrayList<>();
-    private ArrayList<Integer> polesToBeRented = new ArrayList<>();
+
+    // List containing the ID's of the items that will be rented
+    private ArrayList<Integer> itemsToBeRented = new ArrayList<>();
 
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
 
@@ -343,10 +343,12 @@ public class NewRentalGUI extends JPanel {
             rentalOrderOpts.setCustomerID(Integer.toString(selectedCustomerID));
 
             if (!emptyFieldFound) {
-                String insertResult = Queries.insertRentalOrder(rentalOrderOpts);
+                Queries.insertRentalOrder(rentalOrderOpts);
+                int rentalOrderID = Queries.getRentalOrderID(rentalOrderOpts);
+                String insertResult = Queries.addItemsToRentalOrder(itemsToBeRented, rentalOrderID);
                 showMessagePopup("Rental order placed status: " + insertResult);
             } else {
-                showMessagePopup("Customer account could not be created. Please fill out all fields.");
+                showMessagePopup("Order Could not be placed. An error occurred.");
             }
         }
     }
@@ -426,17 +428,17 @@ public class NewRentalGUI extends JPanel {
                         }
                     } else if (tableType == TableType.SKISFORRENT) {
                         if (model.isSelectedIndex(i)) {
-                            skisToBeRented.add((int) skisTable.getValueAt(i,0));
+                            itemsToBeRented.add((int) skisTable.getValueAt(i,0));
                             ((DefaultTableModel) skisTable.getModel()).removeRow(i);
                         }
                     } else if (tableType == TableType.BOOTSFORRENT) {
                         if (model.isSelectedIndex(i)) {
-                            bootsToBeRented.add((int) bootsTable.getValueAt(i,0));
+                            itemsToBeRented.add((int) bootsTable.getValueAt(i,0));
                             ((DefaultTableModel) bootsTable.getModel()).removeRow(i);
                         }
                     } else if (tableType == TableType.POLESFORRENT) {
                         if (model.isSelectedIndex(i)) {
-                            polesToBeRented.add((int) polesTable.getValueAt(i,0));
+                            itemsToBeRented.add((int) polesTable.getValueAt(i,0));
                             ((DefaultTableModel) polesTable.getModel()).removeRow(i);
                         }
                     }

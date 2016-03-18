@@ -1,7 +1,11 @@
 package controller;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Vector;
+import java.util.jar.Pack200;
 
 import controller.CustomerOptions.RentalStatus;
 
@@ -169,43 +173,76 @@ public class Queries {
 
 	public static ResultSet getBootsForRent() {
 		JDBC jdbc = JDBC.getInstance();
-		String getPolesForRentQuery = "SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.size, s.strap "
-									+ "FROM Items i "
-									+ "INNER JOIN Models m ON m.Model_ID = i.Model_ID "
-									+ "LEFT JOIN ItemRentals ir ON ir.Item_ID = i.Item_ID "
-									+ "LEFT JOIN RentalOrders r ON r.Rental_Order_ID = ir.Rental_Order_ID "
-									+ "RIGHT JOIN Boots s ON s.item_id = ir.item_id "
-									+ "WHERE r.Date_In IS NOT NULL "
-									+ "AND i.Out_Of_Service = 'f' "
-									+ "AND NOT i.Condition = 'Poor';";
-		return jdbc.query(getPolesForRentQuery);
+		String getBootsForRentQuery = "(SELECT i.Item_ID, i.Condition, m.Model_Name, b.length_cm, b.size, b.strap "
+								    + "FROM items i "
+								    + "INNER JOIN boots b "
+								    + "ON i.item_id = b.item_id "
+								    + "INNER JOIN models m "
+								    + "ON i.model_id = m.model_id "
+								    + "WHERE i.Out_Of_Service = 'f' "
+								    + "AND NOT i.Condition = 'Poor') "
+								    + "EXCEPT "
+								    + "(SELECT i.Item_ID, i.Condition, m.Model_Name, b.length_cm, b.size, b.strap "
+								    + "FROM itemrentals it "
+								    + "INNER JOIN rentalorders re "
+								    + "ON it.rental_order_id = re.rental_order_id "
+								    + "INNER JOIN items i "
+								    + "ON it.item_id = i.item_id "
+								    + "INNER JOIN boots b "
+								    + "ON it.item_id = b.item_id "
+								    + "INNER JOIN models m "
+								    + "ON i.model_id = m.model_id "
+								    + "WHERE re.date_in IS NULL);";
+		return jdbc.query(getBootsForRentQuery);
 	}
 
 	public static ResultSet getPolesForRent() {
 		JDBC jdbc = JDBC.getInstance();
-		String getPolesForRentQuery = "SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type "
-									+ "FROM Items i "
-									+ "INNER JOIN Models m ON m.Model_ID = i.Model_ID "
-									+ "LEFT JOIN ItemRentals ir ON ir.Item_ID = i.Item_ID "
-									+ "LEFT JOIN RentalOrders r ON r.Rental_Order_ID = ir.Rental_Order_ID "
-									+ "RIGHT JOIN Poles s ON s.item_id = ir.item_id "
-									+ "WHERE r.Date_In IS NOT NULL "
-									+ "AND i.Out_Of_Service = 'f' "
-									+ "AND NOT i.Condition = 'Poor';";
+		String getPolesForRentQuery = "(SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type "
+								    + "FROM items i "
+								    + "INNER JOIN poles s "
+								    + "ON i.item_id = s.item_id "
+								    + "INNER JOIN models m "
+								    + "ON i.model_id = m.model_id "
+								    + "WHERE i.Out_Of_Service = 'f' "
+								    + "AND NOT i.Condition = 'Poor') "
+								    + "EXCEPT "
+								    + "(SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type "
+								    + "FROM itemrentals it "
+								    + "INNER JOIN rentalorders re "
+								    + "ON it.rental_order_id = re.rental_order_id "
+								    + "INNER JOIN items i "
+								    + "ON it.item_id = i.item_id "
+								    + "INNER JOIN poles s "
+								    + "ON it.item_id = s.item_id "
+								    + "INNER JOIN models m "
+								    + "ON i.model_id = m.model_id "
+								    + "WHERE re.date_in IS NULL);";
 		return jdbc.query(getPolesForRentQuery);
 	}
 
 	public static ResultSet getSkisForRent() {
 		JDBC jdbc = JDBC.getInstance();
-		String getSkisForRentQuery = "SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type, s.bindings "
-								   + "FROM Items i "
-				  				   + "INNER JOIN Models m ON m.Model_ID = i.Model_ID "
-				                   + "LEFT JOIN ItemRentals ir ON ir.Item_ID = i.Item_ID "
-				  				   + "LEFT JOIN RentalOrders r ON r.Rental_Order_ID = ir.Rental_Order_ID "
-				  				   + "RIGHT JOIN Skis s ON s.item_id = ir.item_id "
-								   + "WHERE r.Date_In IS NOT NULL "
-								   + "AND i.Out_Of_Service = 'f' "
-								   + "AND NOT i.Condition = 'Poor';";
+		String getSkisForRentQuery = "(SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type, s.bindings "
+								   + "FROM items i "
+								   + "INNER JOIN skis s "
+								   + "ON i.item_id = s.item_id "
+								   + "INNER JOIN models m "
+								   + "ON i.model_id = m.model_id "
+								   + "WHERE i.Out_Of_Service = 'f' "
+								   + "AND NOT i.Condition = 'Poor') "
+								   + "EXCEPT "
+								   + "(SELECT i.Item_ID, i.Condition, m.Model_Name, s.length_cm, s.type, s.bindings "
+								   + "FROM itemrentals it "
+								   + "INNER JOIN rentalorders re "
+								   + "ON it.rental_order_id = re.rental_order_id "
+								   + "INNER JOIN items i "
+								   + "ON it.item_id = i.item_id "
+								   + "INNER JOIN skis s "
+								   + "ON it.item_id = s.item_id "
+								   + "INNER JOIN models m "
+								   + "ON i.model_id = m.model_id "
+								   + "WHERE re.date_in IS NULL);";
 		return jdbc.query(getSkisForRentQuery);
 	}
 
@@ -217,6 +254,42 @@ public class Queries {
 									  + "', '" + rentalOrderOpts.getDateOut()
 				 					  + "', '" + rentalOrderOpts.getTotalPrice() + "');";
 		return jdbc.update(insertRentalOrderQuery);
+	}
+
+	public static int getRentalOrderID(RentalOrderOptions rentalOrderOpts) {
+		JDBC jdbc = JDBC.getInstance();
+		String getRentalOrderIDQuery = "SELECT rental_order_id FROM RentalOrders WHERE "
+										+ "employee_id = '" + rentalOrderOpts.getEmployeeID()
+										+ "' AND customer_id = '" + rentalOrderOpts.getCustomerID()
+										+ "' AND date_out = '" + rentalOrderOpts.getDateOut()
+										+ "' AND total_price = '" + rentalOrderOpts.getTotalPrice() + "';";
+
+		ResultSet rs = jdbc.query(getRentalOrderIDQuery);
+
+		int rental_order_id = -1;
+		try {
+			while (rs.next()) {
+				rental_order_id = (int) rs.getObject(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return rental_order_id;
+	}
+
+	public static String addItemsToRentalOrder(ArrayList<Integer> itemsToBeRented, int rentalOrderID) {
+		JDBC jdbc = JDBC.getInstance();
+		String addItemsToRentalOrderQuery = "INSERT INTO itemrentals (rental_order_id, item_id) VALUES ";
+
+		for (int i = 0; i < itemsToBeRented.size(); i++) {
+			if (i != itemsToBeRented.size() - 1) {
+				addItemsToRentalOrderQuery += "('" + rentalOrderID + "', '" + itemsToBeRented.get(i) + "'), ";
+			} else {
+				addItemsToRentalOrderQuery += "('" + rentalOrderID + "', '" + itemsToBeRented.get(i) + "');";
+			}
+		}
+		return jdbc.update(addItemsToRentalOrderQuery);
 	}
 
     public static ResultSet getCustomers(CustomerOptions options) {
