@@ -87,9 +87,10 @@ public class Queries {
     
     public static ResultSet getSkisInRentalOrder(String rentalOrderID){
         JDBC jdbc = JDBC.getInstance();
-        String skisQuery = "Select * From skis JOIN (Select it.item_id FROM "
+        String skisQuery = "Select * From skis JOIN (Select it.item_id, m.model_id, m.model_name, condition FROM "
                 + "itemrentals it INNER JOIN items "
                 + "ON it.item_id = items.item_id "
+				+ "INNER JOIN models m ON m.model_id = items.model_id "
                 + "Where rental_order_id = " + rentalOrderID + ") S "
                 + "ON skis.item_id = S.item_id";
 
@@ -100,9 +101,10 @@ public class Queries {
     
     public static ResultSet getBootsInRentalOrder(String rentalOrderID){
         JDBC jdbc = JDBC.getInstance();
-        String bootsQuery = "Select * From boots JOIN (Select it.item_id FROM "
+        String bootsQuery = "Select * From boots JOIN (Select it.item_id, m.model_id, m.model_name, condition FROM "
                 + "itemrentals it INNER JOIN items "
                 + "ON it.item_id = items.item_id "
+				+ "INNER JOIN models m ON m.model_id = items.model_id "
                 + "Where rental_order_id = " + rentalOrderID + ") B "
                 + "ON boots.item_id = B.item_id";
         
@@ -113,9 +115,10 @@ public class Queries {
     
     public static ResultSet getPolesInRentalOrder(String rentalOrderID){
         JDBC jdbc = JDBC.getInstance();
-        String polesQuery = "Select * From poles JOIN (Select it.item_id FROM "
+        String polesQuery = "Select * From poles JOIN (Select it.item_id, m.model_id, m.model_name, condition FROM "
                            + "itemrentals it INNER JOIN items "
                            + "ON it.item_id = items.item_id "
+						   + "INNER JOIN models m ON m.model_id = items.model_id "
                            + "Where rental_order_id = " + rentalOrderID + ") P "
                            + "ON poles.item_id = P.item_id";
 
