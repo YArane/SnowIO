@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 
 //import com.sun.tools.javac.util.Name;
 
+import com.sun.tools.javac.util.Name;
 import controller.BillingInfoOptions;
 import controller.CustomerOptions;
 import controller.Queries;
@@ -34,7 +35,7 @@ import controller.RentalOrderOptions;
 
 public class NewRentalGUI extends JPanel {
 
-    private JTable table, bootsTable, polesTable, skisTable;
+    private JTable table, bootsTable, polesTable, skisTable, employeesTable;
 
     // Controller swing
     private JButton createNewCustomer, lookUpCustomer;
@@ -43,10 +44,10 @@ public class NewRentalGUI extends JPanel {
     private JTextField customerNameField;
 
     // Global used to store the rows for the tables used in the views
-    private ResultSet customerTuples, bootTuples, skiTuples, poleTuples;
+    private ResultSet customerTuples, bootTuples, skiTuples, poleTuples, employeeTuples;
 
     // Used Keep track of the Customer selected by the user
-    private int selectedCustomerID;
+    private int selectedCustomerID, selectedEmployeeID;
 
     // List containing the ID's of the items that will be rented
     private ArrayList<Integer> itemsToBeRented = new ArrayList<>();
@@ -54,7 +55,7 @@ public class NewRentalGUI extends JPanel {
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
 
     // Used to determine the type of table to be displayed
-    private enum TableType {CUSTOMERS, BOOTSFORRENT, POLESFORRENT, SKISFORRENT};
+    private enum TableType {CUSTOMERS, BOOTSFORRENT, POLESFORRENT, SKISFORRENT, EMPLOYEES};
 
     public NewRentalGUI() {
         setLayout(new GridBagLayout());
@@ -246,7 +247,11 @@ public class NewRentalGUI extends JPanel {
                 null, options, options[0]);
 
         if (option == 0) { // Continue
-            showItemsAvailableForRent();
+            if (selectedCustomerID == -1) {
+                showMessagePopup("Please select a customer.");
+            } else {
+                showItemsAvailableForRent();
+            }
         }
     }
 
@@ -274,6 +279,12 @@ public class NewRentalGUI extends JPanel {
                 null, options, options[0]);
 
         if (option == 0) {
+
+            if (itemsToBeRented.size() == 0) {
+                showMessagePopup("Please select at least one item to be rented.");
+                return;
+            }
+
             showRentalOrderOptionsMenu();
         }
     }
@@ -287,7 +298,7 @@ public class NewRentalGUI extends JPanel {
         panel.add(label, cp);
 
         String[] rentalOrderDataFields = new String[] {
-                "Employee ID", "Date Out", "Total Price"
+                "Date Out", "Total Price"
         };
 
         Map<String, JTextField> fieldMap = new HashMap<String, JTextField>();
@@ -302,6 +313,13 @@ public class NewRentalGUI extends JPanel {
             cp.gridx = 1;
             fieldMap.put(fieldId, newField);
         }
+
+        cp.gridy = cp.gridy + 1;
+        JLabel specifyEmployeeLabel = new JLabel("Employee processing order:");
+        panel.add(specifyEmployeeLabel, cp);
+
+        cp.gridy = cp.gridy + 1;
+        panel.add(initTable(TableType.EMPLOYEES), cp);
 
         String[] options = new String[]{"Place Rental Order", "Cancel"};
         int option = JOptionPane.showOptionDialog(null, panel, "Create New Customer",
@@ -319,9 +337,6 @@ public class NewRentalGUI extends JPanel {
                 }
 
                 switch (tfield.getName()) {
-                    case "Employee ID":
-                        rentalOrderOpts.setEmployeeID(tfield.getText());
-                        break;
                     case "Date Out":
                         rentalOrderOpts.setDateOut(tfield.getText());
                         break;
@@ -333,6 +348,13 @@ public class NewRentalGUI extends JPanel {
                 }
             }
 
+            if (selectedEmployeeID == -1) {
+                showMessagePopup("Please select an employee.");
+                return;
+            } else {
+                rentalOrderOpts.setEmployeeID(Integer.toString(selectedEmployeeID));
+            }
+
             rentalOrderOpts.setCustomerID(Integer.toString(selectedCustomerID));
 
             if (!emptyFieldFound) {
@@ -341,7 +363,7 @@ public class NewRentalGUI extends JPanel {
                 String insertResult = Queries.addItemsToRentalOrder(itemsToBeRented, rentalOrderID);
                 showMessagePopup("Rental order placed status: " + insertResult);
             } else {
-                showMessagePopup("Order Could not be placed. An error occurred.");
+                showMessagePopup("Order Could not be placed. An error occurred. Please make sure to provide all the fields.");
             }
         }
     }
@@ -351,6 +373,7 @@ public class NewRentalGUI extends JPanel {
         try {
             if (tableType == TableType.CUSTOMERS) {
             	CustomerOptions customerOpts = new CustomerOptions();
+                selectedCustomerID = -1;
                 customerTuples = Queries.getCustomers(customerOpts);
                 table = new JTable(TableGUI.buildTableModel(customerTuples));
                 table.getSelectionModel().addListSelectionListener(new TableHandler(TableType.CUSTOMERS));
@@ -370,6 +393,12 @@ public class NewRentalGUI extends JPanel {
                 skisTable = new JTable(TableGUI.buildTableModel(skiTuples));
                 skisTable.getSelectionModel().addListSelectionListener(new TableHandler(TableType.SKISFORRENT));
                 scrollPane = new JScrollPane(skisTable);
+            } else if (tableType == TableType.EMPLOYEES) {
+                selectedEmployeeID = -1;
+                employeeTuples = Queries.getEmployees();
+                employeesTable = new JTable(TableGUI.buildTableModel(employeeTuples));
+                employeesTable.getSelectionModel().addListSelectionListener(new TableHandler(TableType.EMPLOYEES));
+                scrollPane = new JScrollPane(employeesTable);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -433,6 +462,10 @@ public class NewRentalGUI extends JPanel {
                         if (model.isSelectedIndex(i)) {
                             itemsToBeRented.add((int) polesTable.getValueAt(i,0));
                             ((DefaultTableModel) polesTable.getModel()).removeRow(i);
+                        }
+                    } else if (tableType == TableType.EMPLOYEES) {
+                        if (model.isSelectedIndex(i)) {
+                            selectedEmployeeID = (int) table.getValueAt(i,0);
                         }
                     }
                 }

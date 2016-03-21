@@ -288,6 +288,12 @@ public class Queries {
 		return jdbc.update(addItemsToRentalOrderQuery);
 	}
 
+	public static ResultSet getEmployees() {
+		JDBC jdbc = JDBC.getInstance();
+		String getEmployeesQuery = "SELECT employee_id, name, address, type FROM employees;";
+		return jdbc.query(getEmployeesQuery);
+	}
+
     public static ResultSet getCustomers(CustomerOptions options) {
     	JDBC jdbc = JDBC.getInstance();
     	String customersQuery = "SELECT C.Customer_ID, C.Name, C.Address, C.Phone_Number, HRO.Has_Rental_Order, count(RO.Rental_Order_ID) AS Total_Rentals, sum(RO.Total_Price::decimal) AS Total_Amount_Paid, C.Age, C.Weight_kg, C.Height_cm, C.Credit_Card_Number, BI.Type, BI.Billing_Address, BI.CVV "
