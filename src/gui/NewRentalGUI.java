@@ -27,7 +27,6 @@ import javax.swing.table.DefaultTableModel;
 
 //import com.sun.tools.javac.util.Name;
 
-import com.sun.tools.javac.util.Name;
 import controller.BillingInfoOptions;
 import controller.CustomerOptions;
 import controller.Queries;
@@ -437,7 +436,7 @@ public class NewRentalGUI extends JPanel {
                         }
                     } else if (tableType == TableType.EMPLOYEES) {
                         if (model.isSelectedIndex(i)) {
-                            selectedEmployeeID = (int) table.getValueAt(i,0);
+                            selectedEmployeeID = (int) employeesTable.getValueAt(i,0);
                         }
                     }
                 }

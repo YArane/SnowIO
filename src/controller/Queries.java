@@ -78,6 +78,16 @@ public class Queries {
         return rs;
     }
     
+    public static void closeRentalOrder(String rentalOrderID){
+        JDBC jdbc = JDBC.getInstance();
+        String closeOrderQuery = "UPDATE RentalOrders "
+                + "SET Date_In = NOW() "
+                + "WHERE Date_In IS NULL "
+                + "AND Rental_Order_ID = " + rentalOrderID;
+        System.out.println(closeOrderQuery);
+        jdbc.update(closeOrderQuery);
+    }
+    
     public static ResultSet getSkisInRentalOrder(String rentalOrderID){
         JDBC jdbc = JDBC.getInstance();
         String skisQuery = "Select * From skis JOIN (Select it.item_id FROM "
@@ -248,6 +258,7 @@ public class Queries {
 									  + "VALUES ('" + rentalOrderOpts.getEmployeeID()
 									  + "', '" + rentalOrderOpts.getCustomerID()
 									  + "', now(), '" + rentalOrderOpts.getTotalPrice() + "');";
+		System.out.println(insertRentalOrderQuery);
 		return jdbc.update(insertRentalOrderQuery);
 	}
 

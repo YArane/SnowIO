@@ -48,6 +48,7 @@ public class CurrentRentalsGUI extends JPanel{
     private JCheckBox currentOrders;
     private JCheckBox pastOrders;
     private JButton moreInfo;
+    private JButton closeOrder;
     private int currentRowSelection = -1;
     
     private RentalOrderOptions tableOptions = new RentalOrderOptions();
@@ -156,6 +157,12 @@ public class CurrentRentalsGUI extends JPanel{
         c.gridy=0;
         panel.add(moreInfo, c);
         
+        closeOrder = new JButton("Close Rental Order");
+        closeOrder.addActionListener(new ButtonHandler());
+        c.gridx=0;
+        c.gridy=1;
+        panel.add(closeOrder, c);
+        
         return panel;
     }
    
@@ -177,6 +184,7 @@ public class CurrentRentalsGUI extends JPanel{
         public void actionPerformed(ActionEvent e) {
             switch(e.getActionCommand()){
                 case "More info..":
+                    if(currentRowSelection > -1){
                     JPanel panel = new JPanel();
                     try {
                         String id = table.getValueAt(currentRowSelection, 0) + "";
@@ -191,7 +199,15 @@ public class CurrentRentalsGUI extends JPanel{
                     int option = JOptionPane.showOptionDialog(null, panel, "Items Rented",
                             JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                             null, options, options[0]);
-                    
+                    }
+                    break;
+                case "Close Rental Order":
+                    if(currentRowSelection  > -1){
+                       String id = table.getValueAt(currentRowSelection, 0) + "";
+                       Queries.closeRentalOrder(id);
+                       updateTable();
+                    }
+                    break;
             }
         }
         
