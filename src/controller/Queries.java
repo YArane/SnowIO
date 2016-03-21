@@ -1,11 +1,8 @@
 package controller;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Vector;
-import java.util.jar.Pack200;
 
 import controller.CustomerOptions.RentalStatus;
 

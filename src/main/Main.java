@@ -2,11 +2,6 @@ package main;
 
 import gui.ViewGUI;
 
-import java.awt.FlowLayout;
-import java.awt.LayoutManager;
-
-import javax.swing.JFrame;
-
 import database.JDBC;
 
 public class Main {
