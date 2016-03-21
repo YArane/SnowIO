@@ -247,8 +247,7 @@ public class Queries {
 		String insertRentalOrderQuery = "INSERT INTO RentalOrders (employee_id, customer_id, date_out, total_price) "
 									  + "VALUES ('" + rentalOrderOpts.getEmployeeID()
 									  + "', '" + rentalOrderOpts.getCustomerID()
-									  + "', '" + rentalOrderOpts.getDateOut()
-				 					  + "', '" + rentalOrderOpts.getTotalPrice() + "');";
+									  + "', now(), '" + rentalOrderOpts.getTotalPrice() + "');";
 		return jdbc.update(insertRentalOrderQuery);
 	}
 
@@ -257,7 +256,6 @@ public class Queries {
 		String getRentalOrderIDQuery = "SELECT rental_order_id FROM RentalOrders WHERE "
 										+ "employee_id = '" + rentalOrderOpts.getEmployeeID()
 										+ "' AND customer_id = '" + rentalOrderOpts.getCustomerID()
-										+ "' AND date_out = '" + rentalOrderOpts.getDateOut()
 										+ "' AND total_price = '" + rentalOrderOpts.getTotalPrice() + "';";
 
 		ResultSet rs = jdbc.query(getRentalOrderIDQuery);

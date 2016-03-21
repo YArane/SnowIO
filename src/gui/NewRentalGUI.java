@@ -279,12 +279,10 @@ public class NewRentalGUI extends JPanel {
                 null, options, options[0]);
 
         if (option == 0) {
-
             if (itemsToBeRented.size() == 0) {
                 showMessagePopup("Please select at least one item to be rented.");
                 return;
             }
-
             showRentalOrderOptionsMenu();
         }
     }
@@ -297,23 +295,14 @@ public class NewRentalGUI extends JPanel {
         JLabel label = new JLabel("Enter the information shown below to place the rental order");
         panel.add(label, cp);
 
-        String[] rentalOrderDataFields = new String[] {
-                "Date Out", "Total Price"
-        };
+        cp.gridy = cp.gridy + 1;
+        JLabel fieldLabel = new JLabel("Total Price");
+        panel.add(fieldLabel, cp);
+        JTextField totalPriceField = new JTextField(20);
+        cp.gridx = 2;
+        panel.add(totalPriceField, cp);
 
-        Map<String, JTextField> fieldMap = new HashMap<String, JTextField>();
-        for (String fieldId: rentalOrderDataFields) {
-            cp.gridy = cp.gridy + 1;
-            JLabel fieldLabel = new JLabel(fieldId + ":");
-            panel.add(fieldLabel, cp);
-            JTextField newField = new JTextField(20);
-            newField.setName(fieldId);
-            cp.gridx = 2;
-            panel.add(newField, cp);
-            cp.gridx = 1;
-            fieldMap.put(fieldId, newField);
-        }
-
+        cp.gridx = 1;
         cp.gridy = cp.gridy + 1;
         JLabel specifyEmployeeLabel = new JLabel("Employee processing order:");
         panel.add(specifyEmployeeLabel, cp);
@@ -328,25 +317,12 @@ public class NewRentalGUI extends JPanel {
 
         if (option == 0) {
             RentalOrderOptions rentalOrderOpts = new RentalOrderOptions();
-            boolean emptyFieldFound = false;
-            for (JTextField tfield : fieldMap.values()) {
 
-                if (tfield.getText().equals("")) {
-                    emptyFieldFound = true;
-                    break;
-                }
-
-                switch (tfield.getName()) {
-                    case "Date Out":
-                        rentalOrderOpts.setDateOut(tfield.getText());
-                        break;
-                    case "Total Price":
-                        rentalOrderOpts.setTotalPrice(tfield.getText());
-                        break;
-                    default:
-                        System.out.println("Something is wrong!");
-                }
+            if (totalPriceField.getText().equals("")) {
+                showMessagePopup("Please provide the price of the rental order.");
+                return;
             }
+            rentalOrderOpts.setTotalPrice(totalPriceField.getText());
 
             if (selectedEmployeeID == -1) {
                 showMessagePopup("Please select an employee.");
@@ -357,14 +333,10 @@ public class NewRentalGUI extends JPanel {
 
             rentalOrderOpts.setCustomerID(Integer.toString(selectedCustomerID));
 
-            if (!emptyFieldFound) {
-                Queries.insertRentalOrder(rentalOrderOpts);
-                int rentalOrderID = Queries.getRentalOrderID(rentalOrderOpts);
-                String insertResult = Queries.addItemsToRentalOrder(itemsToBeRented, rentalOrderID);
-                showMessagePopup("Rental order placed status: " + insertResult);
-            } else {
-                showMessagePopup("Order Could not be placed. An error occurred. Please make sure to provide all the fields.");
-            }
+            Queries.insertRentalOrder(rentalOrderOpts);
+            int rentalOrderID = Queries.getRentalOrderID(rentalOrderOpts);
+            String insertResult = Queries.addItemsToRentalOrder(itemsToBeRented, rentalOrderID);
+            showMessagePopup("Rental order placed status: " + insertResult);
         }
     }
 
