@@ -158,14 +158,6 @@ public class CurrentRentalsGUI extends JPanel{
         
         return panel;
     }
-   
-    /*@Override
-    public Dimension getPreferredSize(){
-        Dimension size = super.getPreferredSize();
-        size.width = 780;   
-        size.height = 580;  
-        return size;
-    }*/
     
     //-----------------------------------
     //       --- Event Handlers ----
@@ -252,7 +244,7 @@ public class CurrentRentalsGUI extends JPanel{
         @Override
         public void removeUpdate(DocumentEvent e) {
             tableOptions.setCustomerName("");
-            updateTable(); 
+            updateTable();
         }
 
         @Override

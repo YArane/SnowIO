@@ -78,9 +78,6 @@ public class ViewGUI extends JFrame{
     private void initTabs(){
         tabs.addTab("Current Rentals", new CurrentRentalsGUI());
         tabs.addTab("New Rental", new NewRentalGUI());
-        tabs.addTab("List Items", new ListItemsGUI());
-        tabs.addTab("List Customers", new ListCustomersGUI());
-        tabs.addTab("List Employees", new ListEmployees());
     }
 
     
